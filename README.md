@@ -11,6 +11,7 @@ We will utilize Generative Adversarial Networks (GAN), a form of reinforcement l
 [Sharma 2021](https://link.springer.com/article/10.1007/s11831-021-09705-4) examines five techniques for 3D facial reconstruction: deep learning, epipolar geometry, one-shot learning, 3D morphable models, and shape-from-shading methods. They discuss current datasets for facial reconstruction as well as  several applications of the technology, such as facial puppetry, video dubbing, virtual makeup, and speech-driven animation. The paper finds that the biggest challenge in 3D facial reconstruction is finding datasets, since current public datasets are not sufficiently large enough. Additionally, deep learning models require extensive computational resources, which is another hardware challenge. Because the paper focuses on the 3D face in a broad sense, they present specific facial features – such as the lips, eyelids, and hair – as possible areas of future exploration. While our paper deep-dives into 2D facial restoration via images, it is interesting examining facial restoration in a 3D context.
 
 Our paper’s implementation: ​​https://arxiv.org/pdf/2101.04061v2.pdf 
+
 Another implementation: https://www.hindawi.com/journals/mpe/2021/2384435/ 
 
 ## Data
@@ -46,6 +47,8 @@ Our dataset is a collection of 70,000 images found from the website Flickr. Whil
 ## Division of labor
 
 Preprocessing the data & Degrading original images – Naomi + Galen
+
 Writing a GFP-GAN model — Galen + Anika + Naomi + Lauren
+
 Training and Testing  & Computing accuracy scores (pixel similarity or feature matching) – Anika + Lauren
 
