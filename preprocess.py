@@ -7,6 +7,8 @@ import pandas as pd
 import string
 import re
 
+import numpy as np
+
 
 def remove_stop_words(raw_string: str) -> str:
     """
