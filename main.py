@@ -1,3 +1,4 @@
+import sys
 from model import AnalysisModel
 from preprocess import get_data
 import tensorflow as tf
@@ -38,19 +39,38 @@ def test(model, testing_inputs, testing_labels):
     print("accuracy", accuracy / iterations)
     return accuracy / iterations
 
+# create bag of words vectors
+def generate_bow(inputs):
+    print("we reached generate_bow in main.py")
+    return 
+
 def main():
+    # check user arguments
+    if len(sys.argv) != 2 or sys.argv[1] not in {"BAG_OF_WORDS", "WORD2VEC"}:
+        print("USAGE: python main.py <Model Type>")
+        print("<Model Type>: [BAG_OF_WORDS/WORD2VEC]")
+        exit()
+
     file_path = 'data/IMDBDataset.csv'
     input_header = "review"
     label_header = "sentiment"
     num_epochs = 50
 
     training_inputs, training_labels, testing_inputs, testing_labels = get_data(file_path, input_header, label_header)
-    model = AnalysisModel()
 
+    # initialize model as bag of words or word2vec
+    if sys.argv[1] == "BAG_OF_WORDS":
+        model = AnalysisModel(is_bow=True)
+        # convert inputs to bag of words vectors
+        training_inputs = generate_bow(training_inputs)
+        testing_inputs = generate_bow(testing_inputs)
+    elif sys.argv[1] == "WORD2VEC":
+        model = AnalysisModel(is_bow=False)
+
+    # train and test data
     for epoch in range(num_epochs):
         print("epoch ", epoch)
         train(model, training_inputs, training_labels)
-
     test(model, testing_inputs, testing_labels)
 
 if __name__ == '__main__':
