@@ -44,7 +44,13 @@ def stem(raw_string: str) -> str:
     stemmer = nltk.stem.PorterStemmer()
     return " ".join([stemmer.stem(w) for w in raw_string.split()])
 
+# param inputs: takes in a list of cleaned inputs
+# output: a vocab of the unique input words
+def build_vocab(inputs):
+    vocab = {}
+    unique_inputs = np.unique(inputs)
 
+<<<<<<< HEAD
 def build_vocab(train_inputs, test_inputs):
     # NOTE (lauren): we might need two separate vocabs for train and test -- testing set isn't guaranteed to be a subset of training set
     train_vocab = {}
@@ -59,19 +65,23 @@ def build_vocab(train_inputs, test_inputs):
     # convert unique words in the testing set to unique IDs
     for i in range(len(test_unique)):
         test_vocab[test_unique[i]] = i
+=======
+    # convert unique input words to unique IDs
+    for i in range(len(inputs)):
+        vocab[unique_inputs[i]] = i
+>>>>>>> 5b158e43292690ed8f60b0f7142fbd14ee1ae9b8
 
     # NOTE (lauren): the loops convert each of the inputs to their corresponding ids in the vocab!
     # eg) if vocab = {1: "the", 2: "cat"} and train_inputs = ["the", "cat"], then you loop through and convert so that train_inputs = [1, 2]
-
     # convert the training words
-    for i in range(len(train_inputs)):
-        train_inputs[i] = train_vocab[train_inputs[i]]
+    # for i in range(len(train_inputs)):
+    #     train_inputs[i] = train_vocab[train_inputs[i]]
 
-    # convert the test words
-    for i in range(len(test_inputs)):
-        test_inputs[i] = test_vocab[test_inputs[i]]
+    # # convert the test words
+    # for i in range(len(test_inputs)):
+    #     test_inputs[i] = test_vocab[test_inputs[i]]
 
-    return train_inputs, test_inputs, train_vocab, test_vocab
+    return vocab
 
 def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
         List[str], List[str], List[str], List[str]]:
@@ -110,6 +120,11 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
             final_inputs.append(word)
 
     # encode the labels as positive or negative
+    raw_labels = raw_labels.replace('positive', 1)
+    raw_labels = raw_labels.replace('negative', 0)
+
+    # build vocab
+    vocab = build_vocab(cleaned_inputs)
 
     # we will split the dataset equally between training and testing
     split_index = len(final_inputs) // 2
@@ -119,4 +134,4 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     testing_inputs = final_inputs[split_index:]
     testing_labels = raw_labels[split_index:]
     print(training_inputs[:2])
-    return training_inputs, training_labels, testing_inputs, testing_labels
+    return training_inputs, training_labels, testing_inputs, testing_labels, vocab

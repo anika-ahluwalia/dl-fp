@@ -1,7 +1,7 @@
 import sys
 from bow_model import BagOfWordsModel
 from w2v_model import Word2VecModel
-from preprocess import get_data, build_vocab_bow
+from preprocess import get_data
 import tensorflow as tf
 import numpy as np
 
@@ -57,14 +57,13 @@ def main():
     label_header = "sentiment"
     num_epochs = 1  # NOTE (lauren): changed from 50 epochs to 1 (for now) so we don't overfit
 
-    # NOTE (lauren): what if we use this instead??
+    # NOTE (lauren): this might be helpful?
     # (X_train, y_train), (X_test, y_test) = tf.keras.datasets.imdb.load_data()
     # X = np.concatenate((X_train, X_test), axis=0)
     # y = np.concatenate((y_train, y_test), axis=0)
     # print(X.shape)
 
-    training_inputs, training_labels, testing_inputs, testing_labels = get_data(file_path, input_header, label_header)
-    vocab = build_vocab_bow(training_inputs, testing_inputs)
+    training_inputs, training_labels, testing_inputs, testing_labels, vocab = get_data(file_path, input_header, label_header)
 
     # initialize model as bag of words or word2vec
     if sys.argv[1] == "BAG_OF_WORDS":
