@@ -15,11 +15,16 @@ class BagOfWordsModel(tf.keras.Model):
         self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
 
+        self.max_len = 0  # this is set after we pad the inputs -- see note on line 83
+
+        # NOTE (lauren): do we need an LSTM? some models online use it, others don't
         self.network = tf.keras.Sequential([
-            tf.keras.layers.Embedding(self.vocab_size, self.embedding_size, input_length=self.vocab_size),
-            tf.keras.layers.LSTM(self.embedding_size, return_sequences=True, return_state=True),
-            tf.keras.layers.Dense(250, activation=None),
-            tf.keras.layers.Dense(1, activation='softmax'),  # should output one value
+            tf.keras.layers.Embedding(self.vocab_size, self.embedding_size, input_length=self.max_len),
+            tf.keras.layers.Flatten(),
+
+            # NOTE (lauren): something is up with the data shapes -- commenting out while i look at train/test
+            # tf.keras.layers.Dense(250, activation=None),
+            # tf.keras.layers.Dense(1, activation='softmax'),  # should output one value
         ])
 
     # def create_bag_of_words(inputs):
@@ -43,10 +48,6 @@ class BagOfWordsModel(tf.keras.Model):
     #     bag = self.vectorizer.fit_transform(inputs)
     #     return bag.toarray()
 
-
-    # converts batch of inputs into bag of words
-    # input: input array with words in a batch of reviews
-    # output: vectorized array of len(inputs)
     def create_bag_of_words(self, inputs):
         bag = []
         for review in inputs:
@@ -57,6 +58,11 @@ class BagOfWordsModel(tf.keras.Model):
                 vector[number] += 1
             bag.append(vector)
         return bag
+
+    # input: vectorized_inputs -- a vectorized array of [batch_size, ~length of each review~]
+    # output: an array of [batch_size, max_len], where we pad review rows that are not of length max_len
+    def pad_bags(self, vectorized_inputs):
+        return tf.keras.preprocessing.sequence.pad_sequences(vectorized_inputs, padding='post')
 
     # NOTE (lauren): what is the difference between this and call?
     def predict(self, vectorized_review):
@@ -70,11 +76,14 @@ class BagOfWordsModel(tf.keras.Model):
     
     @tf.function
     def call(self, inputs):
-        bag = self.create_bag_of_words(inputs)
-
-        # NOTE (lauren): lowkey think we need to pad bags?? will look into this further
-
-        logits = self.network(bag)  # NOTE (lauren): do we need an LSTM? some models online use it, others don't
+        bags = self.create_bag_of_words(inputs)
+        padded_inputs = self.pad_bags(bags)
+        
+        # set max_len -- to be used in the embedding layer above
+        # NOTE (lauren): this feels a bit hack-y, but imma keep it for now; feel free to change!
+        self.max_len = len(padded_inputs[0])
+        
+        logits = self.network(padded_inputs)
 
         # added this prediction structure because a lot of online models have it 
             # but honestly we could just not do it too because it seems complex
@@ -82,7 +91,7 @@ class BagOfWordsModel(tf.keras.Model):
         #     logits.append(self.predict(vector))
         
         # throw a couple denses somewhere in here
-        
+
         return logits
 
     # hw 3 

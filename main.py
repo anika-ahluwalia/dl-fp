@@ -15,8 +15,8 @@ def train(model, training_inputs, training_labels):
 
     iterations = int(len(training_inputs) / model.batch_size)
 
-    inputs = tf.split(shuffled_inputs, iterations)
-    labels = tf.split(shuffled_labels, iterations)
+    # inputs = tf.split(shuffled_inputs, iterations)
+    # labels = tf.split(shuffled_labels, iterations)
 
     # batching in here
     for (batch_inputs, batch_labels) in zip(inputs, labels):

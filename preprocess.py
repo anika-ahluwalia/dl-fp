@@ -104,7 +104,7 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     #of the review being one long string...wouldn't be compatible for skipgram
     final_inputs = []
     for review in cleaned_inputs:
-        words = review.split() #returns a long string as a list
+        words = review[0].split() #returns a long string as a list
         for word in words: #for every word in that list...
             final_inputs.append(word)
 
