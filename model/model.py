@@ -2,9 +2,9 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras import Model
 
-class RestorationModel(tf.keras.Model):
+class Analysis(tf.keras.Model):
     def __init__(self):
-        super(RestorationModel, self).__init__()
+        super(Analysis, self).__init__()
     
     @tf.function
     def call(self):
@@ -14,7 +14,7 @@ class RestorationModel(tf.keras.Model):
         pass
 
 def main():
-    model = RestorationModel()
+    model = Analysis()
 
 if __name__ == '__main__':
     main()
