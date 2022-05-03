@@ -11,7 +11,8 @@ class Word2VecModel(tf.keras.Model):
         self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
         
-        self.embedding = tf.keras.layers.Embedding(vocab_size)
+        #COPIED FROM WORD2VEC LAB BY NAOMI
+        self.embedding = tf.keras.layers.Embedding(vocab_size, vocab_size, input_length=vocab_size)
         self.mlp = tf.keras.layers.Dense(vocab_size) #multi-layered perceptron!
     
     @tf.function
