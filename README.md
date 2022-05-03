@@ -2,18 +2,19 @@
 
 ### Disclaimer
 
-You must install pandas, nltk, and beautifulsoup (`pip3 install pandas`, `pip3 install nltk`, and `pip3 install beautifulsoup`) in order to run our project.
+You must install pandas, nltk, and beautifulsoup (`pip3 install pandas`, `pip3 install nltk`, and `pip3 install bs4`) in order to run our project.
 
 ## Introduction
 
-Sentiment analysis applies natural language processing (NLP) to determine the affect of text documents. It is useful for determining how well emotion is conveyed via text, which is particularly applicable for authors who want readers to empathize with their experiences (eg. reviewers). Because our group is interested in NLP and enjoys watching films, we decided to base our final project on a paper that studies sentiment analysis of movie reviews.
-For our final project, we use binary classification to map movie reviews to a positive or negative sentiment, using a dataset of 50,000 IMDB movie reviews for training and testing. We compare two types of models – bag of words and word2vec models – using different classifiers (random forest vs SVM) and feature mappings (averaging vs clustering) to compare their accuracies on the same dataset.
+Sentiment analysis applies natural language processing (NLP) to determine the affect of text documents. It is particularly useful for determining how well emotion is conveyed via text, which is applicable for authors who want readers to empathize with their experiences (eg. reviewers). Because our group is interested in NLP and enjoys watching films, we decided to base our final project on a paper that studies sentiment analysis of movie reviews. We are also interested in the way that films of similar genre are 
+analyzed, and if there is a pattern there. 
+For our final project, we use binary classification to map movie reviews to a positive or negative sentiment, using a dataset of 50,000 IMDB movie reviews for training and testing. It is possible to use two methods -- bag of words and word2vec -- to clean up and convert the movie reviews into vectors. We compare these models (bag of words and word2vec) – using different classifiers (random forest vs SVM) and feature mappings (averaging vs clustering) to compare their accuracies on the same dataset.
 
 ## Related Work
 
 Our project was based on [this Stanford paper](https://cs224d.stanford.edu/reports/PouransariHadi.pdf). The study compares different NLP models with various classifiers to examine the accuracy of sentiment analysis on movie reviews. Results showed that the word2vec model with averaging feature mapping and a logistic regression classifier was the most accurate (86.6%), although most models hovered at around 84-85% accuracy. Although sentiment analysis in any context poses an interesting problem, we decided to choose this paper because it is particularly interesting in the context of movie reviews, since horror/rom-com movies are usually described using inherently positive/negative words (eg. "scary," "gory," "love," "happy").
 
-One related paper is [this article on sentiment analysis of tweets](https://uksim.info/icaiet2014/CD/data/7910a212.pdf). It presents an interesting issue because tweets are limited to 140 characters, which may result in different results from sentiment analysis of regular text. Additionally, tweets have different sentence structures from academic texts and websites because of commonly-used slang and acronyms, which means training datasets must also include slang/acronym.
+One related paper is [this article on sentiment analysis of tweets](https://uksim.info/icaiet2014/CD/data/7910a212.pdf). It presents an interesting issue because tweets are limited to 140 characters, which may result in different results from sentiment analysis of regular text. Additionally, tweets have different sentence structures from academic texts and websites because of commonly-used slang and acronyms, which means training datasets must also include slang and acronyms.
 
 Here is a running list of publicly available implementations:
 [Sentiment Analysis of Movie Reviews](https://www.kaggle.com/code/lakshmi25npathi/sentiment-analysis-of-imdb-movie-reviews/notebook)
@@ -21,7 +22,7 @@ Here is a running list of publicly available implementations:
 
 ## Data
 
-We will be using the IMDB Dataset of 50K Movie Reviews to train our binary classification model, which labels reviews as either positive or negative sentiment. As described in the paper, we will clean up the data during preprocessing to remove stop words, tags, irrelevant punctuation, and convert words to lowercase as needed.
+We will be using the IMDB Dataset of 50K Movie Reviews to train our binary classification model, which labels reviews as either a positive or negative sentiment. As described in the paper, we will clean up the data during preprocessing to remove stop words, tags, irrelevant punctuation, and convert words to lowercase as needed.
 
 ## Methodology
 
@@ -57,10 +58,13 @@ As we expand our project into our reach goal (predicting the number of stars tha
 ## Ethics
 
 ### Why is Deep Learning a good approach to this problem?
-Deep Learning is a good approach to this problem because deep learning is particularly good at processing language and learning about sequential patterns in related information. For example, in class we learned about deep learning's applications into Natural Language Processing (NLP). We learned that there are a variety of deep learning models that could solve this problem and create models that mimick how one would naturally speak in a certain language. This is because deep learning models naturally store information based on what they have seen and use that to make predictions. Thus, by naturally storing information about how sentiment is expressed in reviews and communcications, the model would be a really good predictor of this in future reviews. This is a good way to create an adaptable model that can be specialized on this specific dataset for movies, but could also be generalized to a wide variety of other applications if it was trained on different data. 
+Deep Learning is a good approach to this problem because deep learning is particularly good at processing language and learning about sequential patterns in related information. For example, in class we learned about deep learning's applications into Natural Language Processing (NLP). We learned that there are a variety of deep learning models that could solve this problem and create additional models that mimick how one would naturally speak in a certain language. This is because deep learning models naturally store information based on what they have seen and use that to make predictions. Thus, through such a natural storage process, the model would be a really good predictor of this in future reviews. This is an optimal means of creating an adaptable model that can be specialized on this specific dataset for movies, but could also be generalized to a wide variety of other applications if it was trained on different data. 
 
 ### What is your dataset? Are there any concerns about how it was collected, or labeled? Is it representative? What kind of underlying historical or societal biases might it contain?
-Our dataset is a collection movie reviews from the IMDB website and includes the sentiment indicated in each review. The dataset could be concerning in how it was collected because it is only taken from English Hollywood movies and so our model would likely learn to analyse sentimemt with American vernacular and slang. This means that our model would not be applicable to a wide variety of countries and types of films and therefore could contain societal bias. Additionally, the dataset only provides binary classification into "positive" or "negative" sentiment. This could potentially be worrisome because in real life people generally have both positive and negative words in a sentence and could end up conveying an emotion that is neutral or different than those two. Our model would not be able to account for that and would simply have to classify the review into one of these two categories. Overall, the dataset appears to be representative for fairly straightforward reviews of Hollywood movies, but beyond that specific application, would include severe bias towards this sub-group and would be lacking in knowledge. 
+Our dataset is a collection movie reviews from the IMDB website and includes the sentiment indicated in each review. The dataset could be concerning in how it was collected because it is only taken from English Hollywood movies and so our model would likely learn to analyse sentimemt with American vernacular and slang. This means that our model would not be applicable to a wide variety of countries and types of films and therefore could contain societal bias. Additionally, the dataset only provides binary classification into "positive" or "negative" sentiment. This could potentially be worrisome because in real life people generally have both positive and negative words in a sentence and could end up conveying an emotion that is neutral or different than those two. Our model would not be able to account for that and would simply have to classify the review into one of these two categories. Overall, the dataset appears to be representative for fairly straightforward reviews of Hollywood movies, but beyond that specific application, would include severe bias towards this sub-group and would be lacking in knowledge. In addition, even within English Hollywood movies, we speculate
+that certain genres may have more positive sentiment than others. We are curious as to whether factors such as
+race and gender may contribute to one genre having a more positive sentiment than the others. For example,
+how does sentiment differ between "A League of Their Own" and "The Godfather"? What about "Slumdog Millionare" and the James Bond series?
 
 
 ## Division of labor
@@ -71,10 +75,9 @@ Writing a modified word-2-vec model – Galen + Naomi
 
 Writing a bag of words model – Anika + Lauren
 
-Training and Testing – Lauren + Naomi
+Training and Testing – Anika
 
 Accuracy computations – Anika
 
 ## Reflection
 Our reflection for mentor check-in 3 can be found [here](https://docs.google.com/document/d/100yG-2A6vtRPgLJNLJhYUCCDILl56G8BkJxYx0_JI_0/edit?usp=sharing).
-
