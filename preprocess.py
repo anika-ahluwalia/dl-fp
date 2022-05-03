@@ -50,26 +50,9 @@ def build_vocab(inputs):
     vocab = {}
     unique_inputs = np.unique(inputs)
 
-<<<<<<< HEAD
-def build_vocab(train_inputs, test_inputs):
-    # NOTE (lauren): we might need two separate vocabs for train and test -- testing set isn't guaranteed to be a subset of training set
-    train_vocab = {}
-    test_vocab = {}
-    train_unique = np.unique(train_inputs)
-    test_unique = np.unique(test_inputs)
-
-    # convert unique words in the training set to unique IDs
-    for i in range(len(train_unique)):
-        train_vocab[train_unique[i]] = i
-
-    # convert unique words in the testing set to unique IDs
-    for i in range(len(test_unique)):
-        test_vocab[test_unique[i]] = i
-=======
     # convert unique input words to unique IDs
-    for i in range(len(inputs)):
+    for i in range(len(unique_inputs)):
         vocab[unique_inputs[i]] = i
->>>>>>> 5b158e43292690ed8f60b0f7142fbd14ee1ae9b8
 
     # NOTE (lauren): the loops convert each of the inputs to their corresponding ids in the vocab!
     # eg) if vocab = {1: "the", 2: "cat"} and train_inputs = ["the", "cat"], then you loop through and convert so that train_inputs = [1, 2]
