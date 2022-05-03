@@ -1,14 +1,57 @@
 from model import AnalysisModel
 from preprocess import get_data
+import tensorflow as tf
 
+# from hw 2
+def train(model, training_inputs, training_labels):
+    random_indices = tf.random.uniform([len(training_inputs)], minval = 0, maxval=len(training_inputs) - 1, dtype=tf.dtypes.int32)
+    shuffled_indices = tf.random.shuffle(random_indices)
+    shuffled_inputs = tf.gather(training_inputs, shuffled_indices)
+    shuffled_labels = tf.gather(training_labels, shuffled_indices)
+
+    iterations = int(len(training_inputs) / model.batch_size)
+
+    inputs = tf.split(shuffled_inputs, iterations)
+    labels = tf.split(shuffled_labels, iterations)
+
+    for (batch_inputs, batch_labels) in zip(inputs, labels):
+        batch_inputs = tf.image.random_flip_left_right(batch_inputs)
+
+        with tf.GradientTape() as tape:
+            predictions = model(batch_inputs)
+            loss = model.loss(predictions, batch_labels)
+    
+        gradients = tape.gradient(loss, model.trainable_variables)
+        model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+
+# from hw 2
+def test(model, testing_inputs, testing_labels):
+    iterations = int(len(testing_inputs) / model.batch_size)
+    inputs = tf.split(testing_inputs, iterations)
+    labels = tf.split(testing_labels, iterations)
+    accuracy = 0
+    for (batch_input, batch_label) in zip(inputs, labels):
+        predictions = model(batch_input, True)
+        batch_accuracy = model.accuracy(predictions, batch_label)
+        accuracy = accuracy + batch_accuracy
+
+    print("accuracy", accuracy / iterations)
+    return accuracy / iterations
 
 def main():
     file_path = 'data/IMDBDataset.csv'
     input_header = "review"
     label_header = "sentiment"
+    num_epochs = 50
 
     training_inputs, training_labels, testing_inputs, testing_labels = get_data(file_path, input_header, label_header)
     model = AnalysisModel()
+
+    for epoch in range(num_epochs):
+        print("epoch ", epoch)
+        train(model, training_inputs, training_labels)
+
+    test(model, testing_inputs, testing_labels)
 
 if __name__ == '__main__':
     main()
