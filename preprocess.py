@@ -80,8 +80,14 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     raw_inputs: List[str] = dataset[inputs_header].to_list()
 
     raw_labels = dataset[labels_header].to_list()
-    raw_labels = raw_labels.replace('positive', 1)
-    raw_labels = raw_labels.replace('negative', 0)
+    
+    # encode the labels as positive or negative
+    for i in range(len(raw_labels)):
+        if raw_labels[i] == 'positive':
+            raw_labels[i] = 1
+        else:
+            raw_labels[i] = 0
+
     cleaned_inputs: List[str]
     if not os.path.exists("data/IMDBDataset_cleaned.csv"):
         cleaned_inputs = list(
@@ -93,10 +99,6 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
             csv_writer.writerows(list(zip(cleaned_inputs, raw_labels)))
     else:
         cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
-
-    # encode the labels as positive or negative
-    raw_labels = raw_labels.replace('positive', 1)
-    raw_labels = raw_labels.replace('negative', 0)
 
     # build vocab
     vocab = build_vocab(cleaned_inputs)
