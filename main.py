@@ -1,7 +1,7 @@
 import sys
 from bow_model import BagOfWordsModel
 from w2v_model import Word2VecModel
-from preprocess import get_data
+from preprocess import get_data, build_vocab_bow
 import tensorflow as tf
 
 # from hw 2
@@ -53,10 +53,11 @@ def main():
     num_epochs = 50
 
     training_inputs, training_labels, testing_inputs, testing_labels = get_data(file_path, input_header, label_header)
+    vocab = build_vocab_bow(training_inputs, testing_inputs)
 
     # initialize model as bag of words or word2vec
     if sys.argv[1] == "BAG_OF_WORDS":
-        model = BagOfWordsModel()
+        model = BagOfWordsModel(vocab)
     elif sys.argv[1] == "WORD2VEC":
         model = Word2VecModel()
 

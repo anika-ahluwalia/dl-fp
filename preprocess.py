@@ -48,14 +48,17 @@ def build_vocab_bow(train_inputs, test_inputs):
     # convert to unique IDs
     for i in range(len(unique)):
         vocab[unique[i]] = i
+        
 
-    # convert the training words
-    for i in range(len(train_inputs)):
-        train_inputs[i] = vocab[train_inputs[i]]
+    # what was the purpose of these two loops?
 
-    # convert the test words
-    for i in range(len(test_inputs)):
-        test_inputs[i] = vocab[test_inputs[i]]
+    # # convert the training words
+    # for i in range(len(train_inputs)):
+    #     train_inputs[i] = vocab[train_inputs[i]]
+
+    # # convert the test words
+    # for i in range(len(test_inputs)):
+    #     test_inputs[i] = vocab[test_inputs[i]]
     
     return train_inputs, test_inputs, vocab
 

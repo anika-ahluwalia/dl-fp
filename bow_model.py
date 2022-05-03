@@ -4,15 +4,14 @@ from tensorflow.keras import Model
 from sklearn.feature_extraction.text import CountVectorizer
 
 class BagOfWordsModel(tf.keras.Model):
-    def __init__(self):
+    def __init__(self, vocab):
         super(BagOfWordsModel, self).__init__()
 
         self.batch_size = 120
+        self.vocab = vocab
 
         self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
-
-        self.vectorizer = CountVectorizer()
 
     # def create_bag_of_words(inputs):
     #     vectors = []
@@ -31,9 +30,20 @@ class BagOfWordsModel(tf.keras.Model):
     #         vectors.append(vectorized_words)
     #     return vectors
 
+    # def create_bag_of_words(self, inputs):
+    #     bag = self.vectorizer.fit_transform(inputs)
+    #     return bag.toarray()
+
     def create_bag_of_words(self, inputs):
-        bag = self.vectorizer.fit_transform(inputs)
-        return bag.toarray()
+        bag = []
+        for review in inputs:
+            vector = [0] * len(self.vocab)
+            review_words = review.split()
+            for word in review_words:
+                number = self.vocab[word]
+                vector[number] += 1
+            bag.append(vector)
+        return bag
         
     
     @tf.function
