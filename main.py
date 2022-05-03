@@ -4,9 +4,10 @@ from w2v_model import Word2VecModel
 from preprocess import get_data, build_vocab_bow
 import tensorflow as tf
 
+
 # from hw 2
 def train(model, training_inputs, training_labels):
-    random_indices = tf.random.uniform([len(training_inputs)], minval = 0, maxval=len(training_inputs) - 1, dtype=tf.dtypes.int32)
+    random_indices = tf.random.uniform([len(training_inputs)], minval=0, maxval=len(training_inputs) - 1, dtype=tf.dtypes.int32)
     shuffled_indices = tf.random.shuffle(random_indices)
     shuffled_inputs = tf.gather(training_inputs, shuffled_indices)
     shuffled_labels = tf.gather(training_labels, shuffled_indices)
@@ -26,6 +27,7 @@ def train(model, training_inputs, training_labels):
         gradients = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
+
 # from hw 2
 def test(model, testing_inputs, testing_labels):
     iterations = int(len(testing_inputs) / model.batch_size)
@@ -39,6 +41,7 @@ def test(model, testing_inputs, testing_labels):
 
     print("accuracy", accuracy / iterations)
     return accuracy / iterations
+
 
 def main():
     # check user arguments
@@ -66,6 +69,7 @@ def main():
         print("epoch ", epoch)
         train(model, training_inputs, training_labels)
     test(model, testing_inputs, testing_labels)
+
 
 if __name__ == '__main__':
     main()
