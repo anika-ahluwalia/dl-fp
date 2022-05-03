@@ -5,6 +5,12 @@ from tensorflow.keras import Model
 class AnalysisModel(tf.keras.Model):
     def __init__(self):
         super(AnalysisModel, self).__init__()
+
+        self.batch_size = 120
+
+        self.learning_rate = 0.01
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
+
     
     @tf.function
     def call(self):
