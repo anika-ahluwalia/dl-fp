@@ -58,7 +58,9 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
 
     cleaned_inputs: List[str] = list(
         map(lambda s: remove_stop_words(stem(remove_special_chars(remove_html(s))).lower()), raw_inputs))
+        
     raw_labels = dataset[labels_header].to_list()
+
     # we will split the dataset equally between training and testing
     split_index = len(cleaned_inputs) // 2
     training_inputs = cleaned_inputs[0:split_index + 1]
@@ -67,6 +69,3 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     testing_labels = raw_labels[split_index:]
     print(training_inputs[:2])
     return training_inputs, training_labels, testing_inputs, testing_labels
-
-if __name__ == "__main__":
-    get_data("data/IMDBDataset.csv", "review", "sentiment")

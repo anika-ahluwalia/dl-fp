@@ -2,7 +2,7 @@
 
 ### Disclaimer
 
-You must install pandas, nltk, and beautifulsoup (`pip3 install pandas`, `pip3 install nltk`, and `pip3 install beautifulsoup`) in order to run our project.
+You must install pandas, nltk, and beautifulsoup (`pip3 install pandas`, `pip3 install nltk`, and `pip3 install bs4`) in order to run our project.
 
 ## Introduction
 
