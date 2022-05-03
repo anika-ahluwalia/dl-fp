@@ -1,3 +1,5 @@
+import csv
+import os
 from typing import Tuple, List
 import nltk.stem
 from bs4 import BeautifulSoup
@@ -42,13 +44,13 @@ def stem(raw_string: str) -> str:
     stemmer = nltk.stem.PorterStemmer()
     return " ".join([stemmer.stem(w) for w in raw_string.split()])
 
+
 def build_vocab_bow(train_inputs, test_inputs):
     vocab = {}
     unique = np.unique(train_inputs)
     # convert to unique IDs
     for i in range(len(unique)):
         vocab[unique[i]] = i
-        
 
     # what was the purpose of these two loops?
 
@@ -59,12 +61,12 @@ def build_vocab_bow(train_inputs, test_inputs):
     # # convert the test words
     # for i in range(len(test_inputs)):
     #     test_inputs[i] = vocab[test_inputs[i]]
-    
+
     return train_inputs, test_inputs, vocab
 
 
 def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
-    List[str], List[str], List[str], List[str]]:
+        List[str], List[str], List[str], List[str]]:
     """
     Handles processing corpus of IMDb reviews and sentiment labels into training and testing datasets.
 
@@ -76,16 +78,26 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     dataset: pd.DataFrame = pd.read_csv(file_path)
     raw_inputs: List[str] = dataset[inputs_header].to_list()
 
-    cleaned_inputs: List[str] = list(
-        map(lambda s: remove_stop_words(stem(remove_special_chars(remove_html(s))).lower()), raw_inputs))
-        
     raw_labels = dataset[labels_header].to_list()
+    cleaned_inputs: List[str]
+    if not os.path.exists("data/IMDBDataset_cleaned.csv"):
+        cleaned_inputs = list(
+            map(lambda s: remove_stop_words(stem(remove_special_chars(remove_html(s))).lower()), raw_inputs))
 
-    # we will split the dataset equally between training and testing
+        with open("data/IMDBDataset_cleaned.csv", "w") as cleaned_csv:
+            csv_writer = csv.writer(cleaned_csv)
+            csv_writer.writerow(["cleaned_review", "sentiment"])
+            csv_writer.writerows(list(zip(cleaned_inputs, raw_labels)))
+    else:
+        cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
+
     split_index = len(cleaned_inputs) // 2
     training_inputs = cleaned_inputs[0:split_index + 1]
     training_labels = raw_labels[0:split_index + 1]
     testing_inputs = cleaned_inputs[split_index:]
     testing_labels = raw_labels[split_index:]
-    print(training_inputs[:2])
     return training_inputs, training_labels, testing_inputs, testing_labels
+
+
+if __name__ == "__main__":
+    get_data("data/IMDBDataset.csv", "review", "sentiment")
