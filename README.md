@@ -43,7 +43,9 @@ After training and testing the four combinations, we will compute the accuracy o
 
 ### Metrics
 
-We plan to separate out the dataset that we found into a few sec
+We plan to separate out the dataset that we found into two sections: one for training and one for testing. The dataset comes with reviews categorized into one of two sentiments; positive or negative. We will begin by training our model on half of the data and then seeing how the sentiment matches up. Because we are solving a problem of binary classification, our accuracy measure will be fairly simple. We can simply look at the percentage of examples in our training data that are matched to the correct label. The authors of the paper also used this accuracy measure when computing the accuracy of their model.
+
+As we expand our project into our reach goal (predicting the number of stars that a review received), the accuracy measure will get a bit more complicated. We will take a measure of how close the rating is (exactly the correct number of stars, one star off, two stars off, etc) and will use that to compute how accurate our model is. 
 
 ## Goals
 **Base:** We would like to create a bag of words model that can successfully analyze the sentiment in movie reviews on IMDB.
