@@ -9,9 +9,18 @@ class BagOfWordsModel(tf.keras.Model):
 
         self.batch_size = 120
         self.vocab = vocab
+        self.vocab_size = len(vocab)
+        self.embedding_size = 200
 
         self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
+
+        self.network = tf.keras.Sequential([
+            tf.keras.layers.Embedding(self.vocab_size, self.embedding_size, input_length=self.vocab_size),
+            tf.keras.layers.LSTM(self.embedding_size, return_sequences=True, return_state=True),
+            tf.keras.layers.Dense(250, activation=None),
+            tf.keras.layers.Dense(1, activation='softmax'),  # should output one value
+        ])
 
     # def create_bag_of_words(inputs):
     #     vectors = []
@@ -34,6 +43,10 @@ class BagOfWordsModel(tf.keras.Model):
     #     bag = self.vectorizer.fit_transform(inputs)
     #     return bag.toarray()
 
+
+    # converts batch of inputs into bag of words
+    # input: input array with words in a batch of reviews
+    # output: vectorized array of len(inputs)
     def create_bag_of_words(self, inputs):
         bag = []
         for review in inputs:
@@ -45,25 +58,28 @@ class BagOfWordsModel(tf.keras.Model):
             bag.append(vector)
         return bag
 
-    # TODO: lauren fill in
+    # NOTE (lauren): what is the difference between this and call?
     def predict(self, vectorized_review):
         # passed in a review (in vectorized form)
         # return 0 or 1 for negative or positive?
         # we will have to convert binary classification to labels later
             # should we have 0 = negative, 1 = positive and change that in preprocessing?
+        
         pass
         
     
     @tf.function
-    # inputs is a list of size batch size that has a lists of all of the words in the reviews
     def call(self, inputs):
         bag = self.create_bag_of_words(inputs)
-        logits = []
+
+        # NOTE (lauren): lowkey think we need to pad bags?? will look into this further
+
+        logits = self.network(bag)  # NOTE (lauren): do we need an LSTM? some models online use it, others don't
 
         # added this prediction structure because a lot of online models have it 
             # but honestly we could just not do it too because it seems complex
-        for vector in bag:
-            logits.append(self.predict(vector))
+        # for vector in bag:
+        #     logits.append(self.predict(vector))
         
         # throw a couple denses somewhere in here
         

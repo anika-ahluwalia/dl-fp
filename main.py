@@ -3,6 +3,7 @@ from bow_model import BagOfWordsModel
 from w2v_model import Word2VecModel
 from preprocess import get_data, build_vocab_bow
 import tensorflow as tf
+import numpy as np
 
 
 # from hw 2
@@ -17,6 +18,7 @@ def train(model, training_inputs, training_labels):
     inputs = tf.split(shuffled_inputs, iterations)
     labels = tf.split(shuffled_labels, iterations)
 
+    # batching in here
     for (batch_inputs, batch_labels) in zip(inputs, labels):
         batch_inputs = tf.image.random_flip_left_right(batch_inputs)
 
@@ -53,7 +55,13 @@ def main():
     file_path = 'data/IMDBDataset.csv'
     input_header = "review"
     label_header = "sentiment"
-    num_epochs = 50
+    num_epochs = 1  # NOTE (lauren): changed from 50 epochs to 1 (for now) so we don't overfit
+
+    # NOTE (lauren): what if we use this instead??
+    # (X_train, y_train), (X_test, y_test) = tf.keras.datasets.imdb.load_data()
+    # X = np.concatenate((X_train, X_test), axis=0)
+    # y = np.concatenate((y_train, y_test), axis=0)
+    # print(X.shape)
 
     training_inputs, training_labels, testing_inputs, testing_labels = get_data(file_path, input_header, label_header)
     vocab = build_vocab_bow(training_inputs, testing_inputs)

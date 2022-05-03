@@ -46,24 +46,32 @@ def stem(raw_string: str) -> str:
 
 
 def build_vocab_bow(train_inputs, test_inputs):
-    vocab = {}
-    unique = np.unique(train_inputs)
-    # convert to unique IDs
-    for i in range(len(unique)):
-        vocab[unique[i]] = i
+    # NOTE (lauren): we might need two separate vocabs for train and test -- testing set isn't guaranteed to be a subset of training set
+    train_vocab = {}
+    test_vocab = {}
+    train_unique = np.unique(train_inputs)
+    test_unique = np.unique(test_inputs)
 
-    # what was the purpose of these two loops?
+    # convert unique words in the training set to unique IDs
+    for i in range(len(train_unique)):
+        train_vocab[train_unique[i]] = i
 
-    # # convert the training words
-    # for i in range(len(train_inputs)):
-    #     train_inputs[i] = vocab[train_inputs[i]]
+    # convert unique words in the testing set to unique IDs
+    for i in range(len(test_unique)):
+        test_vocab[test_unique[i]] = i
 
-    # # convert the test words
-    # for i in range(len(test_inputs)):
-    #     test_inputs[i] = vocab[test_inputs[i]]
+    # NOTE (lauren): the loops convert each of the inputs to their corresponding ids in the vocab!
+    # eg) if vocab = {1: "the", 2: "cat"} and train_inputs = ["the", "cat"], then you loop through and convert so that train_inputs = [1, 2]
 
-    return train_inputs, test_inputs, vocab
+    # convert the training words
+    for i in range(len(train_inputs)):
+        train_inputs[i] = train_vocab[train_inputs[i]]
 
+    # convert the test words
+    for i in range(len(test_inputs)):
+        test_inputs[i] = test_vocab[test_inputs[i]]
+
+    return train_inputs, test_inputs, train_vocab, test_vocab
 
 def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
         List[str], List[str], List[str], List[str]]:
@@ -79,6 +87,8 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     raw_inputs: List[str] = dataset[inputs_header].to_list()
 
     raw_labels = dataset[labels_header].to_list()
+    raw_labels = raw_labels.replace('positive', 1)
+    raw_labels = raw_labels.replace('negative', 0)
     cleaned_inputs: List[str]
     if not os.path.exists("data/IMDBDataset_cleaned.csv"):
         cleaned_inputs = list(
@@ -91,13 +101,13 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     else:
         cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
 
+    # encode the labels as positive or negative
+
+    # we will split the dataset equally between training and testing
     split_index = len(cleaned_inputs) // 2
     training_inputs = cleaned_inputs[0:split_index + 1]
     training_labels = raw_labels[0:split_index + 1]
     testing_inputs = cleaned_inputs[split_index:]
     testing_labels = raw_labels[split_index:]
+    print(training_inputs[:2])
     return training_inputs, training_labels, testing_inputs, testing_labels
-
-
-if __name__ == "__main__":
-    get_data("data/IMDBDataset.csv", "review", "sentiment")
