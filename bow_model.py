@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras import Model
+from sklearn.feature_extraction.text import CountVectorizer
 
 class BagOfWordsModel(tf.keras.Model):
     def __init__(self):
@@ -11,23 +12,35 @@ class BagOfWordsModel(tf.keras.Model):
         self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
 
-    
-    def create_bag_of_words(sentence_list):
-        word_occurrences = {}
-        for word in sentence_list:
-            if word in word_occurrences:
-                word_occurrences[word] = word_occurrences.get(word) + 1
-            else:
-                word_occurrences[word] = 1
+        self.vectorizer = CountVectorizer()
 
-        vectorized_words = sentence_list
-        for word in vectorized_words:
-            print(word)
+    # def create_bag_of_words(inputs):
+    #     vectors = []
+    #     for review in inputs:
+    #         review_words = review.split()
+    #         word_occurrences = {}
+    #         for word in review_words:
+    #             if word in word_occurrences:
+    #                 word_occurrences[word] = word_occurrences.get(word) + 1
+    #             else:
+    #                 word_occurrences[word] = 1
+
+    #         vectorized_words = [0] * len(review_words)
+    #         for i in range(len(review_words)):
+    #             vectorized_words[i] = word_occurrences[review_words[i]]
+    #         vectors.append(vectorized_words)
+    #     return vectors
+
+    def create_bag_of_words(self, inputs):
+        bag = self.vectorizer.fit_transform(inputs)
+        return bag.toarray()
+        
     
     @tf.function
     # inputs is a list of size batch size that has a lists of all of the words in the reviews
     def call(self, inputs):
-        print(inputs)
+        bag = self.create_bag_of_words(inputs)
+        print(bag)
 
     # hw 3 
     def loss(self, logits, labels):

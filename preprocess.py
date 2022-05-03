@@ -1,8 +1,6 @@
 from typing import Tuple, List
-
 import nltk.stem
 from bs4 import BeautifulSoup
-
 import pandas as pd
 import string
 import re
