@@ -61,7 +61,7 @@ def main():
         print("<Model Type>: [BAG_OF_WORDS/WORD2VEC]")
         exit()
 
-    file_path = 'data/IMDBDataset.csv'
+    file_path = '../data/IMDBDataset.csv'
     input_header = "review"
     label_header = "sentiment"
     num_epochs = 1
