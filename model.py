@@ -3,12 +3,16 @@ import numpy as np
 from tensorflow.keras import Model
 
 class AnalysisModel(tf.keras.Model):
-    def __init__(self):
+    def __init__(self, is_bow):
         super(AnalysisModel, self).__init__()
+        self.is_bow = is_bow
     
     @tf.function
     def call(self):
-        pass
+        if self.is_bow:
+            print("is_bow is true in model.py")
+        else:
+            print("is_bow is false in model.py")
 
     # hw 3 
     def loss(self, logits, labels):
