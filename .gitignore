@@ -1,5 +1,5 @@
 dataset/ffhq-dataset-v2.json
 dataset/LICENSE.txt
-dataset/images1024x1024
+dataset/images
 .idea
 env/
