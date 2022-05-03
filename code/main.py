@@ -8,18 +8,13 @@ import numpy as np
 
 # from hw 2
 def train(model, training_inputs, training_labels):
-    random_indices = tf.random.uniform([len(training_inputs)], minval=0, maxval=len(training_inputs) - 1, dtype=tf.dtypes.int32)
-    shuffled_indices = tf.random.shuffle(random_indices)
-    shuffled_inputs = tf.gather(training_inputs, shuffled_indices)
-    shuffled_labels = tf.gather(training_labels, shuffled_indices)
 
     iterations = int(len(training_inputs) / model.batch_size)
-
-    # inputs = tf.split(shuffled_inputs, iterations)
-    # labels = tf.split(shuffled_labels, iterations)
+    inputs = tf.split(training_inputs, iterations)
+    labels = tf.split(training_labels, iterations)
 
     # batching in here
-    for (batch_inputs, batch_labels) in zip(training_inputs, training_labels):
+    for (batch_inputs, batch_labels) in zip(inputs, labels):
         batch_inputs = tf.image.random_flip_left_right(batch_inputs)
 
         with tf.GradientTape() as tape:
@@ -43,6 +38,20 @@ def test(model, testing_inputs, testing_labels):
 
     print("accuracy", accuracy / iterations)
     return accuracy / iterations
+
+
+def prep_word2vec_inputs(training_inputs, testing_inputs):
+    modified_training = []
+    for review in training_inputs:
+        review_as_list = review.split()
+        modified_training.append(review_as_list)
+    
+    modified_testing = []
+    for review in testing_inputs:
+        review_as_list = review.split()
+        modified_testing.append(review_as_list)
+
+    return modified_training, modified_testing
 
 
 def main():
@@ -69,6 +78,7 @@ def main():
     if sys.argv[1] == "BAG_OF_WORDS":
         model = BagOfWordsModel(vocab)
     elif sys.argv[1] == "WORD2VEC":
+        training_inputs, testing_inputs = prep_word2vec_inputs(training_inputs, testing_inputs)
         model = Word2VecModel()
 
     # train and test data

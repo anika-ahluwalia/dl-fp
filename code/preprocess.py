@@ -78,15 +78,15 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     """
     dataset: pd.DataFrame = pd.read_csv(file_path)
     raw_inputs: List[str] = dataset[inputs_header].to_list()
-
     raw_labels = dataset[labels_header].to_list()
+
+    # getting rid of headers
+    raw_inputs = raw_inputs[1:]
+    raw_labels = raw_labels[1:]
     
     # encode the labels as positive or negative
-    for i in range(len(raw_labels)):
-        if raw_labels[i] == 'positive':
-            raw_labels[i] = 1
-        else:
-            raw_labels[i] = 0
+    raw_labels = np.where(raw_labels == 'positive', raw_labels, 1)
+    raw_labels = np.where(raw_labels == 'negative', raw_labels, 0)
 
     cleaned_inputs: List[str]
     if not os.path.exists("data/IMDBDataset_cleaned.csv"):
@@ -100,23 +100,23 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     else:
         cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
     
-    #**added by naomi so that the inputs contain each word as its own string instead
-    #of the review being one long string...wouldn't be compatible for skipgram
-    final_inputs = []
-    for review in cleaned_inputs:
-        words = review[0].split() #returns a long string as a list
-        for word in words: #for every word in that list...
-            final_inputs.append(word)
+    # #**added by naomi so that the inputs contain each word as its own string instead
+    # #of the review being one long string...wouldn't be compatible for skipgram
+    # final_inputs = []
+    # for review in cleaned_inputs:
+    #     words = review[0].split() #returns a long string as a list
+    #     for word in words: #for every word in that list...
+    #         final_inputs.append(word)
 
     # build vocab
     vocab = build_vocab(cleaned_inputs)
 
     # we will split the dataset equally between training and testing
-    split_index = len(final_inputs) // 2
-    training_inputs = final_inputs[0:split_index + 1] #shape of cleaned_inputs is a list of reviews
+    split_index = len(cleaned_inputs) // 2
+    training_inputs = cleaned_inputs[0:split_index + 1] #shape of cleaned_inputs is a list of reviews
     # (which is a list of strings, but we want a list of words)
     training_labels = raw_labels[0:split_index + 1]
-    testing_inputs = final_inputs[split_index:]
+    testing_inputs = cleaned_inputs[split_index:]
     testing_labels = raw_labels[split_index:]
     print(training_inputs[:2])
     return training_inputs, training_labels, testing_inputs, testing_labels, vocab
