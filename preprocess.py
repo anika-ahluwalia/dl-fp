@@ -50,9 +50,26 @@ def build_vocab(inputs):
     vocab = {}
     unique_inputs = np.unique(inputs)
 
+<<<<<<< HEAD
+def build_vocab(train_inputs, test_inputs):
+    # NOTE (lauren): we might need two separate vocabs for train and test -- testing set isn't guaranteed to be a subset of training set
+    train_vocab = {}
+    test_vocab = {}
+    train_unique = np.unique(train_inputs)
+    test_unique = np.unique(test_inputs)
+
+    # convert unique words in the training set to unique IDs
+    for i in range(len(train_unique)):
+        train_vocab[train_unique[i]] = i
+
+    # convert unique words in the testing set to unique IDs
+    for i in range(len(test_unique)):
+        test_vocab[test_unique[i]] = i
+=======
     # convert unique input words to unique IDs
     for i in range(len(inputs)):
         vocab[unique_inputs[i]] = i
+>>>>>>> 5b158e43292690ed8f60b0f7142fbd14ee1ae9b8
 
     # NOTE (lauren): the loops convert each of the inputs to their corresponding ids in the vocab!
     # eg) if vocab = {1: "the", 2: "cat"} and train_inputs = ["the", "cat"], then you loop through and convert so that train_inputs = [1, 2]
@@ -99,15 +116,24 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
             csv_writer.writerows(list(zip(cleaned_inputs, raw_labels)))
     else:
         cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
+    
+    #**added by naomi so that the inputs contain each word as its own string instead
+    #of the review being one long string...wouldn't be compatible for skipgram
+    final_inputs = []
+    for review in cleaned_inputs:
+        words = review.split() #returns a long string as a list
+        for word in words: #for every word in that list...
+            final_inputs.append(word)
 
     # build vocab
     vocab = build_vocab(cleaned_inputs)
 
     # we will split the dataset equally between training and testing
-    split_index = len(cleaned_inputs) // 2
-    training_inputs = cleaned_inputs[0:split_index + 1]
+    split_index = len(final_inputs) // 2
+    training_inputs = final_inputs[0:split_index + 1] #shape of cleaned_inputs is a list of reviews
+    # (which is a list of strings, but we want a list of words)
     training_labels = raw_labels[0:split_index + 1]
-    testing_inputs = cleaned_inputs[split_index:]
+    testing_inputs = final_inputs[split_index:]
     testing_labels = raw_labels[split_index:]
     print(training_inputs[:2])
     return training_inputs, training_labels, testing_inputs, testing_labels, vocab
