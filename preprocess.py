@@ -43,25 +43,32 @@ def stem(raw_string: str) -> str:
     return " ".join([stemmer.stem(w) for w in raw_string.split()])
 
 def build_vocab_bow(train_inputs, test_inputs):
-    vocab = {}
-    unique = np.unique(train_inputs)
-    # convert to unique IDs
-    for i in range(len(unique)):
-        vocab[unique[i]] = i
-        
-
-    # what was the purpose of these two loops?
-
-    # # convert the training words
-    # for i in range(len(train_inputs)):
-    #     train_inputs[i] = vocab[train_inputs[i]]
-
-    # # convert the test words
-    # for i in range(len(test_inputs)):
-    #     test_inputs[i] = vocab[test_inputs[i]]
+    # NOTE (lauren): we might need two separate vocabs for train and test -- testing set isn't guaranteed to be a subset of training set
+    train_vocab = {}
+    test_vocab = {}
+    train_unique = np.unique(train_inputs)
+    test_unique = np.unique(test_inputs)
     
-    return train_inputs, test_inputs, vocab
+    # convert unique words in the training set to unique IDs
+    for i in range(len(train_unique)):
+        train_vocab[train_unique[i]] = i
 
+    # convert unique words in the testing set to unique IDs
+    for i in range(len(test_unique)):
+        test_vocab[test_unique[i]] = i
+        
+    # NOTE (lauren): the loops convert each of the inputs to their corresponding ids in the vocab!
+    # eg) if vocab = {1: "the", 2: "cat"} and train_inputs = ["the", "cat"], then you loop through and convert so that train_inputs = [1, 2]
+
+    # convert the training words
+    for i in range(len(train_inputs)):
+        train_inputs[i] = train_vocab[train_inputs[i]]
+
+    # convert the test words
+    for i in range(len(test_inputs)):
+        test_inputs[i] = test_vocab[test_inputs[i]]
+    
+    return train_inputs, test_inputs, train_vocab, test_vocab
 
 def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     List[str], List[str], List[str], List[str]]:
@@ -80,6 +87,10 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
         map(lambda s: remove_stop_words(stem(remove_special_chars(remove_html(s))).lower()), raw_inputs))
         
     raw_labels = dataset[labels_header].to_list()
+
+    # encode the labels as positive or negative
+    raw_labels = raw_labels.replace('positive', 1)
+    raw_labels = raw_labels.replace('negative', 0)
 
     # we will split the dataset equally between training and testing
     split_index = len(cleaned_inputs) // 2
