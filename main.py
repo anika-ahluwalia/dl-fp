@@ -1,5 +1,6 @@
 import sys
-from model import AnalysisModel
+from bow_model import BagOfWordsModel
+from w2v_model import Word2VecModel
 from preprocess import get_data
 import tensorflow as tf
 
@@ -39,11 +40,6 @@ def test(model, testing_inputs, testing_labels):
     print("accuracy", accuracy / iterations)
     return accuracy / iterations
 
-# create bag of words vectors
-def generate_bow(inputs):
-    print("we reached generate_bow in main.py")
-    return 
-
 def main():
     # check user arguments
     if len(sys.argv) != 2 or sys.argv[1] not in {"BAG_OF_WORDS", "WORD2VEC"}:
@@ -60,12 +56,9 @@ def main():
 
     # initialize model as bag of words or word2vec
     if sys.argv[1] == "BAG_OF_WORDS":
-        model = AnalysisModel(is_bow=True)
-        # convert inputs to bag of words vectors
-        training_inputs = generate_bow(training_inputs)
-        testing_inputs = generate_bow(testing_inputs)
+        model = BagOfWordsModel()
     elif sys.argv[1] == "WORD2VEC":
-        model = AnalysisModel(is_bow=False)
+        model = Word2VecModel()
 
     # train and test data
     for epoch in range(num_epochs):
