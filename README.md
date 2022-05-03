@@ -75,7 +75,7 @@ Writing a modified word-2-vec model – Galen + Naomi
 
 Writing a bag of words model – Anika + Lauren
 
-Training and Testing – Anika + Lauren + Naomi
+Training and Testing – Anika
 
 Accuracy computations – Anika
 

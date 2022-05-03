@@ -44,13 +44,30 @@ class BagOfWordsModel(tf.keras.Model):
                 vector[number] += 1
             bag.append(vector)
         return bag
+
+    # TODO: lauren fill in
+    def predict(self, vectorized_review):
+        # passed in a review (in vectorized form)
+        # return 0 or 1 for negative or positive?
+        # we will have to convert binary classification to labels later
+            # should we have 0 = negative, 1 = positive and change that in preprocessing?
+        pass
         
     
     @tf.function
     # inputs is a list of size batch size that has a lists of all of the words in the reviews
     def call(self, inputs):
         bag = self.create_bag_of_words(inputs)
-        print(bag)
+        logits = []
+
+        # added this prediction structure because a lot of online models have it 
+            # but honestly we could just not do it too because it seems complex
+        for vector in bag:
+            logits.append(self.predict(vector))
+        
+        # throw a couple denses somewhere in here
+        
+        return logits
 
     # hw 3 
     def loss(self, logits, labels):
