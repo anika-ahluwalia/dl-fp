@@ -19,7 +19,7 @@ def train(model, training_inputs, training_labels):
     # labels = tf.split(shuffled_labels, iterations)
 
     # batching in here
-    for (batch_inputs, batch_labels) in zip(inputs, labels):
+    for (batch_inputs, batch_labels) in zip(training_inputs, training_labels):
         batch_inputs = tf.image.random_flip_left_right(batch_inputs)
 
         with tf.GradientTape() as tape:
@@ -55,7 +55,7 @@ def main():
     file_path = 'data/IMDBDataset.csv'
     input_header = "review"
     label_header = "sentiment"
-    num_epochs = 1  # NOTE (lauren): changed from 50 epochs to 1 (for now) so we don't overfit
+    num_epochs = 1
 
     # NOTE (lauren): this might be helpful?
     # (X_train, y_train), (X_test, y_test) = tf.keras.datasets.imdb.load_data()
