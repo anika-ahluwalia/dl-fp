@@ -45,7 +45,7 @@ def stem(raw_string: str) -> str:
     return " ".join([stemmer.stem(w) for w in raw_string.split()])
 
 
-def build_vocab_bow(train_inputs, test_inputs):
+def build_vocab(train_inputs, test_inputs):
     # NOTE (lauren): we might need two separate vocabs for train and test -- testing set isn't guaranteed to be a subset of training set
     train_vocab = {}
     test_vocab = {}
@@ -100,14 +100,23 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
             csv_writer.writerows(list(zip(cleaned_inputs, raw_labels)))
     else:
         cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
+    
+    #**added by naomi so that the inputs contain each word as its own string instead
+    #of the review being one long string...wouldn't be compatible for skipgram
+    final_inputs = []
+    for review in cleaned_inputs:
+        words = review.split() #returns a long string as a list
+        for word in words: #for every word in that list...
+            final_inputs.append(word)
 
     # encode the labels as positive or negative
 
     # we will split the dataset equally between training and testing
-    split_index = len(cleaned_inputs) // 2
-    training_inputs = cleaned_inputs[0:split_index + 1]
+    split_index = len(final_inputs) // 2
+    training_inputs = final_inputs[0:split_index + 1] #shape of cleaned_inputs is a list of reviews
+    # (which is a list of strings, but we want a list of words)
     training_labels = raw_labels[0:split_index + 1]
-    testing_inputs = cleaned_inputs[split_index:]
+    testing_inputs = final_inputs[split_index:]
     testing_labels = raw_labels[split_index:]
     print(training_inputs[:2])
     return training_inputs, training_labels, testing_inputs, testing_labels
