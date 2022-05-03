@@ -1,5 +1,9 @@
 # dl-fp
 
+### Disclaimer
+
+You must install Pandas (`pip3 install pandas`) in order to run our project.
+
 ## Introduction
 
 [This paper](https://arxiv.org/pdf/2101.04061v2.pdf) proposes the use of Generative Adversarial Networks (GANs) to aid in facial recognition and restoration in partially corrupted or incomplete images. The paper attempts to look at images with low resolution, blur, or other image degradations and use reinforcement learning to predict how the degraded portions could be restored. We chose this paper because we wanted to work with images and image manipulation in a potentially useful way. We also are interested to examine the ways in which the dataset (and the potential biases present in the dataset) could impact the results that are produced. 
