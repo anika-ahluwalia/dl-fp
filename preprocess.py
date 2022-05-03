@@ -108,4 +108,4 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     testing_inputs = cleaned_inputs[split_index:]
     testing_labels = raw_labels[split_index:]
     print(training_inputs[:2])
-    return training_inputs, training_labels, testing_inputs, testing_labels
+    return training_inputs, training_labels, testing_inputs, testing_labels, vocab
