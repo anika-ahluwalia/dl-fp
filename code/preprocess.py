@@ -47,7 +47,14 @@ def stem(raw_string: str) -> str:
 # output: a vocab of the unique input words
 def build_vocab(inputs):
     vocab = {}
-    unique_inputs = np.unique(inputs)
+
+    all_words = []
+
+    for review in inputs:
+        for word in review:
+            all_words.append(word)
+    
+    unique_inputs = np.unique(all_words)
 
     # convert unique input words to unique IDs
     for i in range(len(unique_inputs)):
@@ -106,14 +113,21 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     else:
         cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
         cleaned_inputs = cleaned_inputs[1:]
+
+    ready_inputs = []
+    for review in cleaned_inputs:
+        review_as_list = review[0].split()
+        ready_inputs.append(review_as_list)
     
     # build vocab
-    vocab = build_vocab(cleaned_inputs)
+    vocab = build_vocab(ready_inputs)
 
     # we will split the dataset equally between training and testing
-    split_index = len(cleaned_inputs) // 2
-    training_inputs = cleaned_inputs[0:split_index + 1]
+    split_index = len(ready_inputs) // 2
+    training_inputs = ready_inputs[0:split_index + 1]
     training_labels = cleaned_labels[0:split_index + 1]
-    testing_inputs = cleaned_inputs[split_index:]
+    testing_inputs = ready_inputs[split_index:]
     testing_labels = cleaned_labels[split_index:]
+
+    
     return training_inputs, training_labels, testing_inputs, testing_labels, vocab

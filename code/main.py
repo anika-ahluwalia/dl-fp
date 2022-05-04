@@ -32,23 +32,6 @@ def test(model, testing_inputs, testing_labels):
     print("accuracy", accuracy / iterations)
     return accuracy / iterations
 
-
-def prep_inputs(training_inputs, testing_inputs):
-    modified_training = []
-    for review in training_inputs:
-        # review as we are getting it right now is a list in a list like ["review", "rating"]
-        review_as_list = review[0].split()
-        modified_training.append(review_as_list)
-    
-    modified_testing = []
-    for review in testing_inputs:
-        # review as we are getting it right now is a list in a list like ["review", "rating"]
-        review_as_list = review[0].split()
-        modified_testing.append(review_as_list)
-
-    return modified_training, modified_testing
-
-
 def main():
     # check user arguments
     if len(sys.argv) != 2 or sys.argv[1] not in {"BAG_OF_WORDS", "WORD2VEC"}:
@@ -62,7 +45,6 @@ def main():
     num_epochs = 1
 
     training_inputs, training_labels, testing_inputs, testing_labels, vocab = get_data(file_path, input_header, label_header)
-    training_inputs, testing_inputs = prep_inputs(training_inputs, testing_inputs)
 
     # initialize model as bag of words or word2vec
     if sys.argv[1] == "BAG_OF_WORDS":

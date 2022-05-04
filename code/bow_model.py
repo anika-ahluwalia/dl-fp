@@ -33,8 +33,7 @@ class BagOfWordsModel(tf.keras.Model):
         bag = []
         for review in inputs:
             vector = [0] * len(self.vocab)
-            review_words = review.split()
-            for word in review_words:
+            for word in review:
                 number = self.vocab[word]
                 vector[number] += 1
             bag.append(vector)
