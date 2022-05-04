@@ -1,4 +1,7 @@
 import sys
+
+from tqdm import tqdm
+
 from bow_model import BagOfWordsModel
 from w2v_model import Word2VecModel
 from preprocess import get_data
@@ -9,7 +12,7 @@ def train(model, training_inputs, training_labels):
 
     # NOTE (anika): made it only do one small batch because it took too long
     # for i in range(0, len(training_inputs), model.batch_size):
-    for i in range(0, 200, 50):
+    for i in tqdm(range(0, 200, 50)):
         # NOTE (anika): omg even training on just batch size of 50 for bag of words
             # caused my computer to die and took over 4 min
         print(i)
@@ -30,7 +33,7 @@ def test(model, testing_inputs, testing_labels):
 
     # NOTE (anika): made it only do one small batch because it took too long
     # for i in range(0, len(testing_inputs), model.batch_size):
-    for i in range(0, 200, 50):
+    for i in tqdm(range(0, 200, 50)):
         batch_inputs = testing_inputs[i : i + model.batch_size]
         batch_labels = testing_labels[i : i + model.batch_size]
         predictions = model(batch_inputs, True)
