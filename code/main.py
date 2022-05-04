@@ -9,13 +9,9 @@ import numpy as np
 # from hw 2
 def train(model, training_inputs, training_labels):
 
-    iterations = int(len(training_inputs) / model.batch_size)
-    inputs = tf.split(training_inputs, iterations)
-    labels = tf.split(training_labels, iterations)
-
-    # batching in here
-    for (batch_inputs, batch_labels) in zip(inputs, labels):
-        batch_inputs = tf.image.random_flip_left_right(batch_inputs)
+    for i in range(0, len(training_inputs), model.batch_size):
+        batch_inputs = training_inputs[i : i + model.batch_size]
+        batch_labels = training_labels[i : i + model.batch_size]
 
         with tf.GradientTape() as tape:
             predictions = model(batch_inputs)
@@ -28,27 +24,29 @@ def train(model, training_inputs, training_labels):
 # from hw 2
 def test(model, testing_inputs, testing_labels):
     iterations = int(len(testing_inputs) / model.batch_size)
-    inputs = tf.split(testing_inputs, iterations)
-    labels = tf.split(testing_labels, iterations)
     accuracy = 0
-    for (batch_input, batch_label) in zip(inputs, labels):
-        predictions = model(batch_input, True)
-        batch_accuracy = model.accuracy(predictions, batch_label)
+    for i in range(0, len(testing_inputs), model.batch_size):
+        batch_inputs = testing_inputs[i : i + model.batch_size]
+        batch_labels = testing_labels[i : i + model.batch_size]
+        predictions = model(batch_inputs, True)
+        batch_accuracy = model.accuracy(predictions, batch_labels)
         accuracy = accuracy + batch_accuracy
 
     print("accuracy", accuracy / iterations)
     return accuracy / iterations
 
 
-def prep_word2vec_inputs(training_inputs, testing_inputs):
+def prep_inputs(training_inputs, testing_inputs):
     modified_training = []
     for review in training_inputs:
-        review_as_list = review.split()
+        # review as we are getting it right now is a list in a list like ["review", "rating"]
+        review_as_list = review[0].split()
         modified_training.append(review_as_list)
     
     modified_testing = []
     for review in testing_inputs:
-        review_as_list = review.split()
+        # review as we are getting it right now is a list in a list like ["review", "rating"]
+        review_as_list = review[0].split()
         modified_testing.append(review_as_list)
 
     return modified_training, modified_testing
@@ -61,7 +59,7 @@ def main():
         print("<Model Type>: [BAG_OF_WORDS/WORD2VEC]")
         exit()
 
-    file_path = '../data/IMDBDataset.csv'
+    file_path = 'data/IMDBDataset.csv'
     input_header = "review"
     label_header = "sentiment"
     num_epochs = 1
@@ -73,13 +71,13 @@ def main():
     # print(X.shape)
 
     training_inputs, training_labels, testing_inputs, testing_labels, vocab = get_data(file_path, input_header, label_header)
+    training_inputs, testing_inputs = prep_inputs(training_inputs, testing_inputs)
 
     # initialize model as bag of words or word2vec
     if sys.argv[1] == "BAG_OF_WORDS":
         model = BagOfWordsModel(vocab)
     elif sys.argv[1] == "WORD2VEC":
-        training_inputs, testing_inputs = prep_word2vec_inputs(training_inputs, testing_inputs)
-        model = Word2VecModel()
+        model = Word2VecModel(len(vocab), 100)
 
     # train and test data
     for epoch in range(num_epochs):

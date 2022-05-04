@@ -85,8 +85,9 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     raw_labels = raw_labels[1:]
     
     # encode the labels as positive or negative
-    raw_labels = np.where(raw_labels == 'positive', raw_labels, 1)
-    raw_labels = np.where(raw_labels == 'negative', raw_labels, 0)
+    # note from anika: hold off on this for now -- we can look later
+    # raw_labels = np.where(raw_labels == 'positive', raw_labels, 1)
+    # raw_labels = np.where(raw_labels == 'negative', raw_labels, 0)
 
     cleaned_inputs: List[str]
     if not os.path.exists("data/IMDBDataset_cleaned.csv"):
@@ -99,6 +100,7 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
             csv_writer.writerows(list(zip(cleaned_inputs, raw_labels)))
     else:
         cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
+        cleaned_inputs = cleaned_inputs[1:]
     
     # #**added by naomi so that the inputs contain each word as its own string instead
     # #of the review being one long string...wouldn't be compatible for skipgram
@@ -118,5 +120,4 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     training_labels = raw_labels[0:split_index + 1]
     testing_inputs = cleaned_inputs[split_index:]
     testing_labels = raw_labels[split_index:]
-    print(training_inputs[:2])
     return training_inputs, training_labels, testing_inputs, testing_labels, vocab
