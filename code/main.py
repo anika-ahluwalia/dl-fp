@@ -36,7 +36,7 @@ def test(model, testing_inputs, testing_labels):
     for i in tqdm(range(0, 200, 50)):
         batch_inputs = testing_inputs[i : i + model.batch_size]
         batch_labels = testing_labels[i : i + model.batch_size]
-        predictions = model(batch_inputs, True)
+        predictions = model(batch_inputs)
         batch_accuracy = model.accuracy(predictions, batch_labels)
         accuracy = accuracy + batch_accuracy
 
