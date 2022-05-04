@@ -9,13 +9,7 @@ import tensorflow as tf
 import numpy as np
 
 def train(model, training_inputs, training_labels):
-
-    # NOTE (anika): made it only do one small batch because it took too long
-    # for i in range(0, len(training_inputs), model.batch_size):
-    for i in tqdm(range(0, 200, 50)):
-        # NOTE (anika): omg even training on just batch size of 50 for bag of words
-            # caused my computer to die and took over 4 min
-        print(i)
+    for i in tqdm(range(0, len(training_inputs), model.batch_size)):
         batch_inputs = training_inputs[i : i + model.batch_size]
         batch_labels = training_labels[i : i + model.batch_size]
 
@@ -30,10 +24,8 @@ def train(model, training_inputs, training_labels):
 def test(model, testing_inputs, testing_labels):
     iterations = int(len(testing_inputs) / model.batch_size)
     accuracy = 0
-
-    # NOTE (anika): made it only do one small batch because it took too long
-    # for i in range(0, len(testing_inputs), model.batch_size):
-    for i in tqdm(range(0, 200, 50)):
+    
+    for i in tqdm(range(0, len(testing_inputs), model.batch_size)):
         batch_inputs = testing_inputs[i : i + model.batch_size]
         batch_labels = testing_labels[i : i + model.batch_size]
         predictions = model(batch_inputs)
