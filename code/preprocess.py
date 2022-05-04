@@ -64,6 +64,8 @@ def build_vocab(inputs):
     # for i in range(len(test_inputs)):
     #     test_inputs[i] = test_vocab[test_inputs[i]]
 
+    # note from anika ^ i think we need to preserve inputs as is for now so commented out
+
     return vocab
 
 def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
@@ -84,8 +86,10 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     raw_inputs = raw_inputs[1:]
     raw_labels = raw_labels[1:]
     
+
     # encode the labels as positive or negative
     # note from anika: hold off on this for now -- we can look later
+
     # raw_labels = np.where(raw_labels == 'positive', raw_labels, 1)
     # raw_labels = np.where(raw_labels == 'negative', raw_labels, 0)
 
@@ -115,8 +119,7 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
 
     # we will split the dataset equally between training and testing
     split_index = len(cleaned_inputs) // 2
-    training_inputs = cleaned_inputs[0:split_index + 1] #shape of cleaned_inputs is a list of reviews
-    # (which is a list of strings, but we want a list of words)
+    training_inputs = cleaned_inputs[0:split_index + 1]
     training_labels = raw_labels[0:split_index + 1]
     testing_inputs = cleaned_inputs[split_index:]
     testing_labels = raw_labels[split_index:]

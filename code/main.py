@@ -5,8 +5,6 @@ from preprocess import get_data
 import tensorflow as tf
 import numpy as np
 
-
-# from hw 2
 def train(model, training_inputs, training_labels):
 
     for i in range(0, len(training_inputs), model.batch_size):
@@ -21,7 +19,6 @@ def train(model, training_inputs, training_labels):
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
 
-# from hw 2
 def test(model, testing_inputs, testing_labels):
     iterations = int(len(testing_inputs) / model.batch_size)
     accuracy = 0
@@ -63,12 +60,6 @@ def main():
     input_header = "review"
     label_header = "sentiment"
     num_epochs = 1
-
-    # NOTE (lauren): this might be helpful?
-    # (X_train, y_train), (X_test, y_test) = tf.keras.datasets.imdb.load_data()
-    # X = np.concatenate((X_train, X_test), axis=0)
-    # y = np.concatenate((y_train, y_test), axis=0)
-    # print(X.shape)
 
     training_inputs, training_labels, testing_inputs, testing_labels, vocab = get_data(file_path, input_header, label_header)
     training_inputs, testing_inputs = prep_inputs(training_inputs, testing_inputs)
