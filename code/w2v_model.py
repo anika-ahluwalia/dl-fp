@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 
 
@@ -23,7 +24,10 @@ class Word2VecModel(tf.keras.Model):
         # COPIED FROM WORD2VEC LAB BY NAOMI
         self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_size)
         # Multi-layered perceptron!
-        self.mlp = tf.keras.layers.Dense(vocab_size, activation="softmax")
+        self.network = tf.keras.Sequential([
+            tf.keras.layers.Dense(300, activation="relu"),
+            tf.keras.layers.Dense(1, activation="softmax"),
+        ])
 
     def call(self, inputs):
         """
@@ -31,17 +35,19 @@ class Word2VecModel(tf.keras.Model):
 
         :param inputs: A list of size batch_size that
         """
-
-        # error: got shape [120] but wanted [120, 91]
-        # should we do something to inputs before passing them in?
-        embedding = self.embedding(tf.convert_to_tensor(inputs))
-        return self.mlp(embedding)
+        review_feature_vectors = []
+        for review in inputs:
+            embedddings = self.embedding(tf.convert_to_tensor(review))
+            review_feature_vectors.append(np.average(embedddings, axis=0))
+        return self.network(tf.convert_to_tensor(review_feature_vectors))
 
     def loss(self, logits, labels):
-        prob = tf.nn.sparse_softmax_cross_entropy_with_logits(labels, logits)
+        logits = tf.reshape(logits, [-1])
+        prob = tf.keras.losses.binary_crossentropy(labels, logits)
         loss = tf.reduce_mean(tf.cast(prob, tf.float32))
         return loss
 
     def accuracy(self, predictions, labels):
-        correct_predictions = tf.equal(tf.argmax(predictions, 1), tf.argmax(labels, 1))
+        predictions = tf.reshape(predictions, [-1])
+        correct_predictions = tf.equal(tf.argmax(predictions), tf.argmax(labels))
         return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
