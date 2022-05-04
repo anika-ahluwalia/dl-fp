@@ -32,7 +32,10 @@ class Word2VecModel(tf.keras.Model):
 
         :param inputs: A list of size batch_size that
         """
-        embedding = self.embedding(inputs)
+
+        # error: got shape [120] but wanted [120, 91]
+        # should we do something to inputs before passing them in?
+        embedding = self.embedding(tf.convert_to_tensor(inputs))
         return self.mlp(embedding)
 
     def loss(self, logits, labels):

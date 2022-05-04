@@ -64,8 +64,6 @@ def main():
     training_inputs, training_labels, testing_inputs, testing_labels, vocab = get_data(file_path, input_header, label_header)
     training_inputs, testing_inputs = prep_inputs(training_inputs, testing_inputs)
 
-    print(training_labels)
-    
     # initialize model as bag of words or word2vec
     if sys.argv[1] == "BAG_OF_WORDS":
         model = BagOfWordsModel(vocab)
