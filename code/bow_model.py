@@ -6,7 +6,7 @@ class BagOfWordsModel(tf.keras.Model):
     def __init__(self, vocab):
         super(BagOfWordsModel, self).__init__()
 
-        self.batch_size = 120
+        self.batch_size = 50
         self.vocab = vocab
         self.vocab_size = len(vocab)
         self.embedding_size = 200
@@ -21,7 +21,7 @@ class BagOfWordsModel(tf.keras.Model):
         self.GRU = tf.keras.layers.GRU(self.batch_size, return_sequences=True, return_state=True)
 
         self.network = tf.keras.Sequential([
-            tf.keras.layers.Embedding(self.vocab_size, self.embedding_size, input_length=self.max_len),
+            tf.keras.layers.Embedding(100, self.embedding_size, input_length=self.max_len),
             tf.keras.layers.Flatten(),
 
             # NOTE (lauren): something is up with the data shapes -- commenting out while i look at train/test
@@ -29,28 +29,30 @@ class BagOfWordsModel(tf.keras.Model):
             # tf.keras.layers.Dense(1, activation='softmax'),  # should output one value
         ])
 
+    # NOTE (lauren): added calculating avg review length for max_len in embedding layer so we don't have to iterate twice
     def create_bag_of_words(self, inputs):
         bag = []
+        review_length = []
         for review in inputs:
             vector = [0] * len(self.vocab)
+            review_length.append(len(review))
             for word in review:
                 number = self.vocab[word]
                 vector[number] += 1
             bag.append(vector)
+        self.max_len = int(np.ceil(np.mean(review_length)))
+        print("max len: " + str(self.max_len))
         return bag
 
     # input: vectorized_inputs -- a vectorized array of [batch_size, ~length of each review~]
     # output: an array of [batch_size, max_len], where we pad review rows that are not of length max_len
     def pad_bags(self, vectorized_inputs):
-        return tf.keras.preprocessing.sequence.pad_sequences(vectorized_inputs, padding='post')
-    
+        return tf.keras.preprocessing.sequence.pad_sequences(vectorized_inputs, maxlen=self.max_len, padding='post', truncating='post')
+
     @tf.function
     def call(self, inputs):
         bags = self.create_bag_of_words(inputs)
         padded_inputs = self.pad_bags(bags)
-        
-        # set max_len -- to be used in the embedding layer above
-        self.max_len = len(padded_inputs[0])
         logits = self.network(padded_inputs)
 
         return logits
