@@ -25,7 +25,6 @@ class Word2VecModel(tf.keras.Model):
         # Multi-layered perceptron!
         self.mlp = tf.keras.layers.Dense(vocab_size, activation="softmax")
 
-    @tf.function
     def call(self, inputs):
         """
         Generates a probability distribution over all words in the corpus for which word likely follows the current word.
