@@ -88,10 +88,12 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     
 
     # encode the labels as positive or negative
-    # note from anika: hold off on this for now -- we can look later
-
-    # raw_labels = np.where(raw_labels == 'positive', raw_labels, 1)
-    # raw_labels = np.where(raw_labels == 'negative', raw_labels, 0)
+    cleaned_labels = []
+    for label in raw_labels:
+        if label == 'positive':
+            cleaned_labels.append(1)
+        elif label == 'negative':
+            cleaned_labels.append(0)
 
     cleaned_inputs: List[str]
     if not os.path.exists("data/IMDBDataset_cleaned.csv"):
@@ -106,21 +108,13 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
         cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
         cleaned_inputs = cleaned_inputs[1:]
     
-    # #**added by naomi so that the inputs contain each word as its own string instead
-    # #of the review being one long string...wouldn't be compatible for skipgram
-    # final_inputs = []
-    # for review in cleaned_inputs:
-    #     words = review[0].split() #returns a long string as a list
-    #     for word in words: #for every word in that list...
-    #         final_inputs.append(word)
-
     # build vocab
     vocab = build_vocab(cleaned_inputs)
 
     # we will split the dataset equally between training and testing
     split_index = len(cleaned_inputs) // 2
     training_inputs = cleaned_inputs[0:split_index + 1]
-    training_labels = raw_labels[0:split_index + 1]
+    training_labels = cleaned_labels[0:split_index + 1]
     testing_inputs = cleaned_inputs[split_index:]
-    testing_labels = raw_labels[split_index:]
+    testing_labels = cleaned_labels[split_index:]
     return training_inputs, training_labels, testing_inputs, testing_labels, vocab
