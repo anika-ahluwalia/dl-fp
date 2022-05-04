@@ -70,7 +70,7 @@ def build_vocab(inputs):
     # for i in range(len(test_inputs)):
     #     test_inputs[i] = test_vocab[test_inputs[i]]
 
-    # note from anika ^ i think we need to preserve inputs as is for now so commented out
+    # NOTE (anika) ^ i think we need to preserve inputs as is for now so commented out
 
     return vocab
 

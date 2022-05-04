@@ -55,7 +55,6 @@ class BagOfWordsModel(tf.keras.Model):
 
         return logits
 
-    # hw 3 
     def loss(self, logits, labels):
         prob = tf.keras.losses.sparse_categorical_crossentropy(labels, logits)
         loss = tf.reduce_mean(tf.cast(prob, tf.float32))
