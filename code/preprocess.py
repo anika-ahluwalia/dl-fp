@@ -123,7 +123,7 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     vocab = build_vocab(ready_inputs)
 
     # we will split the dataset equally between training and testing
-    split_index = len(ready_inputs) // 2
+    split_index = (len(ready_inputs) // 10) * 7  # changed to 70/30 split
     training_inputs = ready_inputs[0:split_index + 1]
     training_labels = cleaned_labels[0:split_index + 1]
     testing_inputs = ready_inputs[split_index:]
