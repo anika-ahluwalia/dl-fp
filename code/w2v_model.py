@@ -17,11 +17,6 @@ class Word2VecModel(tf.keras.Model):
         """
         super(Word2VecModel, self).__init__()
 
-        self.batch_size = 120
-
-        self.learning_rate = 0.01
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
-
         self.network = tf.keras.Sequential([
             tf.keras.layers.Embedding(vocab_size, embedding_size),
             tf.keras.layers.Dense(vocab_size)
