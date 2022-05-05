@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from bow_model import BagOfWordsModel
 from w2v_model import Word2VecModel
-from preprocess import get_data
+from preprocess import get_data, word2vec_preprocess
 import tensorflow as tf
 import numpy as np
 
@@ -58,8 +58,8 @@ def main():
     if sys.argv[1] == "BAG_OF_WORDS":
         model = BagOfWordsModel(vocab)
     elif sys.argv[1] == "WORD2VEC":
-        training_inputs = list(map(lambda review: list(map(lambda word: vocab[word], review)), training_inputs))
-        testing_inputs = list(map(lambda review: list(map(lambda word: vocab[word], review)), testing_inputs))
+        training_inputs = word2vec_preprocess(training_inputs, vocab, 3)
+        testing_inputs = word2vec_preprocess(testing_inputs, vocab, 3)
         model = Word2VecModel(len(vocab), 100)
 
     # train and test data

@@ -1,12 +1,32 @@
 import csv
 import os
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 import nltk.stem
 from bs4 import BeautifulSoup
 import pandas as pd
 import string
 import re
 import numpy as np
+
+
+def word2vec_preprocess(review_list: List[List[str]], vocab_dict: Dict[str, int], window_size: int) -> List[List[int]]:
+    """
+    Takes a list of reviews, which are each a list of words, and generates a list of skipgrams.
+
+    :param review_list: A list of reviews, each of which is a list of strings (words).
+    :param vocab_dict: A dictionary mapping words to their numeric ID.
+    :param window_size: For each word in a review, how many other words in the review to consider for skipgrams.
+    :return: A list of skipgrams generated from the corpus.
+    """
+    skipgrams: List[List[int]] = []
+    for review in review_list:
+        for word_index, word in enumerate(review):
+            min_idx = max(0, word_index - window_size)
+            max_idx = min(len(review), word_index + window_size + 1)
+            for nb_word in review[min_idx:max_idx]:
+                if nb_word != word:
+                    skipgrams.append([vocab_dict[word], vocab_dict[nb_word]])
+    return skipgrams
 
 
 def remove_stop_words(raw_string: str) -> str:
@@ -43,6 +63,7 @@ def stem(raw_string: str) -> str:
     stemmer = nltk.stem.PorterStemmer()
     return " ".join([stemmer.stem(w) for w in raw_string.split()])
 
+
 # param inputs: takes in a list of cleaned inputs
 # output: a vocab of the unique input words
 def build_vocab(inputs):
@@ -53,7 +74,7 @@ def build_vocab(inputs):
     for review in inputs:
         for word in review:
             all_words.append(word)
-    
+
     unique_inputs = np.unique(all_words)
 
     # convert unique input words to unique IDs
@@ -74,8 +95,9 @@ def build_vocab(inputs):
 
     return vocab
 
+
 def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
-        List[str], List[str], List[str], List[str]]:
+    List[List[str]], List[int], List[List[str]], List[int], Dict[str, int]]:
     """
     Handles processing corpus of IMDb reviews and sentiment labels into training and testing datasets.
 
@@ -91,7 +113,6 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     # getting rid of headers
     raw_inputs = raw_inputs[1:]
     raw_labels = raw_labels[1:]
-    
 
     # encode the labels as positive or negative
     cleaned_labels = []
@@ -118,7 +139,7 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     for review in cleaned_inputs:
         review_as_list = review[0].split()
         ready_inputs.append(review_as_list)
-    
+
     # build vocab
     vocab = build_vocab(ready_inputs)
 
@@ -129,5 +150,4 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     testing_inputs = ready_inputs[split_index:]
     testing_labels = cleaned_labels[split_index:]
 
-    
     return training_inputs, training_labels, testing_inputs, testing_labels, vocab
