@@ -64,9 +64,22 @@ def main():
 
     # train and test data
     print("training the model...")
-    for epoch in range(num_epochs):
-        print("epoch ", epoch)
-        train(model, training_inputs, training_labels)
+    if not sys.argv[1] == "WORD2VEC":
+        for epoch in range(num_epochs):
+            print("epoch ", epoch)
+            train(model, training_inputs, training_labels)
+    else:
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(),
+            loss=tf.nn.sparse_softmax_cross_entropy_with_logits,
+            metrics=[]
+        )
+        model.fit(
+            x=np.array(training_inputs)[:, [0]],
+            y=np.array(training_inputs)[:, [1]],
+            epochs=20,
+            batch_size=120
+        )
     print("testing...")
     test(model, testing_inputs, testing_labels)
 

@@ -7,6 +7,7 @@ import pandas as pd
 import string
 import re
 import numpy as np
+from tqdm import tqdm
 
 
 def word2vec_preprocess(review_list: List[List[str]], vocab_dict: Dict[str, int], window_size: int) -> List[List[int]]:
@@ -19,7 +20,7 @@ def word2vec_preprocess(review_list: List[List[str]], vocab_dict: Dict[str, int]
     :return: A list of skipgrams generated from the corpus.
     """
     skipgrams: List[List[int]] = []
-    for review in review_list:
+    for review in tqdm(review_list):
         for word_index, word in enumerate(review):
             min_idx = max(0, word_index - window_size)
             max_idx = min(len(review), word_index + window_size + 1)
