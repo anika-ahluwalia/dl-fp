@@ -58,8 +58,8 @@ def main():
     if sys.argv[1] == "BAG_OF_WORDS":
         model = BagOfWordsModel(vocab)
     elif sys.argv[1] == "WORD2VEC":
-        training_inputs = word2vec_preprocess(training_inputs, vocab, 3)
-        testing_inputs = word2vec_preprocess(testing_inputs, vocab, 3)
+        training_inputs = word2vec_preprocess(training_inputs, vocab, 2)
+        testing_inputs = word2vec_preprocess(testing_inputs, vocab, 2)
         model = Word2VecModel(len(vocab), 100)
 
     # train and test data
@@ -69,16 +69,20 @@ def main():
             print("epoch ", epoch)
             train(model, training_inputs, training_labels)
     else:
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath="saved_models/word2vec.ckpt",
+                                                         save_weights_only=True,
+                                                         verbose=1)
         model.compile(
             optimizer=tf.keras.optimizers.Adam(),
             loss=tf.nn.sparse_softmax_cross_entropy_with_logits,
             metrics=[]
         )
         model.fit(
-            x=np.array(training_inputs)[:, [0]],
-            y=np.array(training_inputs)[:, [1]],
+            np.array(training_inputs)[:, [0]],
+            np.array(training_inputs)[:, [1]],
             epochs=20,
-            batch_size=120
+            batch_size=120,
+            callbacks=[cp_callback]
         )
     print("testing...")
     test(model, testing_inputs, testing_labels)
