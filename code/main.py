@@ -7,6 +7,8 @@ from w2v_model import Word2VecModel
 from preprocess import get_data, word2vec_preprocess
 import tensorflow as tf
 import numpy as np
+import tensorflow_cloud as tfc
+
 
 # NOTE (anika): returning list of losses for visualization
 def train(model, training_inputs, training_labels):
@@ -40,6 +42,7 @@ def test(model, testing_inputs, testing_labels):
     print("accuracy", accuracy / iterations)
     return accuracy / iterations
 
+
 # def visualize_loss(losses):
 #     x = [i for i in range(len(losses))]
 #     plt.plot(x, losses)
@@ -55,14 +58,19 @@ def main():
         print("<Model Type>: [BAG_OF_WORDS/WORD2VEC]")
         exit()
 
-    file_path = 'data/IMDBDataset.csv'
+    if tfc.remote():
+        file_path = "gs://dl-fp/data/IMDBDataset.csv"
+        cleaned_file_path = "gs://dl-fp/data/IMDBDataset_cleaned.csv"
+    else:
+        file_path = "data/IMDBDataset.csv"
+        cleaned_file_path = "data/IMDBDataset_cleaned.csv"
     input_header = "review"
     label_header = "sentiment"
     num_epochs = 1
 
     print("preprocessing the data...")
-    training_inputs, training_labels, testing_inputs, testing_labels, vocab = get_data(file_path, input_header,
-                                                                                       label_header)
+    training_inputs, training_labels, testing_inputs, testing_labels, vocab = get_data(file_path, cleaned_file_path,
+                                                                                       input_header, label_header)
 
     # initialize model as bag of words or word2vec
     print("making the model...")
@@ -91,15 +99,15 @@ def main():
             metrics=[]
         )
         model.fit(
-            np.array(training_inputs)[:, [0]],
-            np.array(training_inputs)[:, [1]],
+            np.array(training_inputs)[:, 0],
+            np.array(training_inputs)[:, 1],
             epochs=20,
             batch_size=120,
             callbacks=[cp_callback]
         )
-    
-    if (len(all_losses) > 0):
-        visualize_loss(all_losses)
+
+    # if (len(all_losses) > 0):
+    #     visualize_loss(all_losses)
 
     print("testing...")
     test(model, testing_inputs, testing_labels)

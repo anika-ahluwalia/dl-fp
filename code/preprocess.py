@@ -89,12 +89,13 @@ def build_vocab(inputs: List[List[str]]) -> Dict[str, int]:
     return vocab
 
 
-def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
+def get_data(file_path: str, cleaned_file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     List[List[str]], List[int], List[List[str]], List[int], Dict[str, int]]:
     """
     Handles processing corpus of IMDb reviews and sentiment labels into training and testing datasets.
 
     :param file_path: The path to the CSV file containing the IMDb dataset.
+    :param cleaned_file_path: The path to the CSV file containing the cleaned IMDb dataset.
     :param inputs_header: The name of the column containing IMDb reviews.
     :param labels_header: The name of the column containing reviews' sentiment labels.
     :return: Four lists: training inputs, training labels, testing inputs, and testing labels.
@@ -103,34 +104,31 @@ def get_data(file_path: str, inputs_header: str, labels_header: str) -> Tuple[
     raw_inputs: List[str] = dataset[inputs_header].to_list()
     raw_labels = dataset[labels_header].to_list()
 
-    # getting rid of headers
-    raw_inputs = raw_inputs[1:]
-    raw_labels = raw_labels[1:]
-
-    # encode the labels as positive or negative
-    cleaned_labels = []
-    for label in raw_labels:
-        if label == 'positive':
-            cleaned_labels.append(1)
-        elif label == 'negative':
-            cleaned_labels.append(0)
-
     cleaned_inputs: List[str]
-    if not os.path.exists("data/IMDBDataset_cleaned.csv"):
+    if not os.path.exists(cleaned_file_path):
+        # encode the labels as positive or negative
+        cleaned_labels = []
+        for label in raw_labels:
+            if label == 'positive':
+                cleaned_labels.append(1)
+            elif label == 'negative':
+                cleaned_labels.append(0)
+
         cleaned_inputs = list(
             map(lambda s: remove_stop_words(stem(remove_special_chars(remove_html(s))).lower()), raw_inputs))
 
-        with open("data/IMDBDataset_cleaned.csv", "w") as cleaned_csv:
+        with open(cleaned_file_path, "w") as cleaned_csv:
             csv_writer = csv.writer(cleaned_csv)
             csv_writer.writerow(["cleaned_review", "sentiment"])
-            csv_writer.writerows(list(zip(cleaned_inputs, raw_labels)))
+            csv_writer.writerows(list(zip(cleaned_inputs, cleaned_labels)))
     else:
-        cleaned_inputs = list(csv.reader(open("data/IMDBDataset_cleaned.csv", "r")))
-        cleaned_inputs = cleaned_inputs[1:]
+        cleaned_dataset = np.array(list(csv.reader(open(cleaned_file_path, "r"))))
+        cleaned_inputs = cleaned_dataset[1:, 0]
+        cleaned_labels = cleaned_dataset[1:, 1]
 
     ready_inputs = []
     for review in cleaned_inputs:
-        review_as_list = review[0].split()
+        review_as_list = review.split()
         ready_inputs.append(review_as_list)
 
     # build vocab
