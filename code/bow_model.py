@@ -10,6 +10,8 @@ class BagOfWordsModel(tf.keras.Model):
         self.vocab_size = len(vocab)
         self.embedding_size = 200
 
+        self.hidden_layer_size = 100
+
         self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
 
@@ -20,10 +22,10 @@ class BagOfWordsModel(tf.keras.Model):
             tf.keras.layers.Embedding(self.vocab_size, self.embedding_size, input_length=self.max_len),
             tf.keras.layers.LSTM(self.embedding_size),
             tf.keras.layers.Dense(250, activation='relu'),
+            tf.keras.layers.Dense(self.hidden_layer_size, activation='relu'),
             tf.keras.layers.Dense(1, activation='softmax')
         ])
 
-    # NOTE (lauren): added calculating avg review length for max_len in embedding layer so we don't have to iterate twice
     def create_bag_of_words(self, inputs):
         bag = []
         review_length = []
@@ -47,14 +49,12 @@ class BagOfWordsModel(tf.keras.Model):
         return logits
 
     def loss(self, logits, labels):
-        # NOTE (lauren): reshaped this because logits were (50, 1) but labels were (50,)
         logits = tf.reshape(logits, [-1])
         prob = tf.keras.losses.binary_crossentropy(labels, logits)
         loss = tf.reduce_mean(tf.cast(prob, tf.float32))
         return loss
 
     def accuracy(self, predictions, labels):
-        # NOTE (lauren): reshaped this because predictions were (50, 1) but labels were (50,)
         predictions = tf.reshape(predictions, [-1])
         correct_predictions = tf.equal(tf.argmax(predictions), tf.argmax(labels))
         return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))

@@ -8,8 +8,11 @@ from preprocess import get_data, word2vec_preprocess
 import tensorflow as tf
 import numpy as np
 
+from matplotlib import pyplot as plt
 
+# NOTE (anika): returning list of losses for visualization
 def train(model, training_inputs, training_labels):
+    losses = []
     for i in tqdm(range(0, len(training_inputs), model.batch_size)):
         batch_inputs = training_inputs[i: i + model.batch_size]
         batch_labels = training_labels[i: i + model.batch_size]
@@ -17,9 +20,11 @@ def train(model, training_inputs, training_labels):
         with tf.GradientTape() as tape:
             predictions = model(batch_inputs)
             loss = model.loss(predictions, batch_labels)
+            losses.append(loss)
 
         gradients = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    return losses
 
 
 def test(model, testing_inputs, testing_labels):
@@ -36,6 +41,13 @@ def test(model, testing_inputs, testing_labels):
     print("accuracy", accuracy / iterations)
     return accuracy / iterations
 
+def visualize_loss(losses): 
+    x = [i for i in range(len(losses))]
+    plt.plot(x, losses)
+    plt.title('Loss per batch')
+    plt.xlabel('Batch')
+    plt.ylabel('Loss')
+    plt.show()
 
 def main():
     # check user arguments
@@ -64,10 +76,12 @@ def main():
 
     # train and test data
     print("training the model...")
+    all_losses = []
     if not sys.argv[1] == "WORD2VEC":
         for epoch in range(num_epochs):
             print("epoch ", epoch)
-            train(model, training_inputs, training_labels)
+            losses = train(model, training_inputs, training_labels)
+            all_losses.append(losses)
     else:
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath="saved_models/word2vec.ckpt",
                                                          save_weights_only=True,
@@ -84,6 +98,10 @@ def main():
             batch_size=120,
             callbacks=[cp_callback]
         )
+    
+    if (len(all_losses) > 0):
+        visualize_loss(all)
+
     print("testing...")
     test(model, testing_inputs, testing_labels)
 
