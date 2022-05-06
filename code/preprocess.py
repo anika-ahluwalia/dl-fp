@@ -65,9 +65,13 @@ def stem(raw_string: str) -> str:
     return " ".join([stemmer.stem(w) for w in raw_string.split()])
 
 
-# param inputs: takes in a list of cleaned inputs
-# output: a vocab of the unique input words
-def build_vocab(inputs):
+def build_vocab(inputs: List[List[str]]) -> Dict[str, int]:
+    """
+    Creates a dictionary mapping all unique words in the corpus to a numeric ID, 0 through (# of unique words - 1).
+
+    :param inputs: A list of reviews, each of which is a list of words.
+    :return: A dictionary mapping words to their numeric ID.
+    """
     vocab = {}
 
     all_words = []
@@ -81,18 +85,6 @@ def build_vocab(inputs):
     # convert unique input words to unique IDs
     for i in range(len(unique_inputs)):
         vocab[unique_inputs[i]] = i
-
-    # NOTE (lauren): the loops convert each of the inputs to their corresponding ids in the vocab!
-    # eg) if vocab = {1: "the", 2: "cat"} and train_inputs = ["the", "cat"], then you loop through and convert so that train_inputs = [1, 2]
-    # convert the training words
-    # for i in range(len(train_inputs)):
-    #     train_inputs[i] = train_vocab[train_inputs[i]]
-
-    # # convert the test words
-    # for i in range(len(test_inputs)):
-    #     test_inputs[i] = test_vocab[test_inputs[i]]
-
-    # NOTE (anika) ^ i think we need to preserve inputs as is for now so commented out
 
     return vocab
 
