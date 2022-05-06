@@ -1,5 +1,7 @@
 import tensorflow as tf
 import numpy as np
+# NOTE (anika): added because of addition on line 27
+import keras.backend as K
 
 class BagOfWordsModel(tf.keras.Model):
     def __init__(self, vocab):
@@ -12,7 +14,7 @@ class BagOfWordsModel(tf.keras.Model):
 
         self.hidden_layer_size = 100
 
-        self.learning_rate = 0.01
+        self.learning_rate = 0.0001
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
 
         self.max_len = 1  # this is set after we pad the inputs -- see note on line 83
@@ -20,8 +22,11 @@ class BagOfWordsModel(tf.keras.Model):
         # NOTE (lauren): lol one more bug -- all of the logits have a value of 1.??
         self.network = tf.keras.Sequential([
             tf.keras.layers.Embedding(self.vocab_size, self.embedding_size, input_length=self.max_len),
-            tf.keras.layers.LSTM(self.embedding_size),
-            tf.keras.layers.Dense(250, activation='relu'),
+            # NOTE (anika): found an architecture online that doesn't use LSTM -- instead uses Lambda with mean so decided to try it out
+            # https://analyticsindiamag.com/the-continuous-bag-of-words-cbow-model-in-nlp-hands-on-implementation-with-codes/
+            # tf.keras.layers.LSTM(self.embedding_size),
+            tf.keras.layers.Lambda(lambda x: K.mean(x, axis=1), output_shape=(self.batch_size,)),
+            tf.keras.layers.Dense(self.batch_size, activation='relu'),
             tf.keras.layers.Dense(self.hidden_layer_size, activation='relu'),
             tf.keras.layers.Dense(1, activation='softmax')
         ])

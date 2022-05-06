@@ -20,6 +20,7 @@ def train(model, training_inputs, training_labels):
         with tf.GradientTape() as tape:
             predictions = model(batch_inputs)
             loss = model.loss(predictions, batch_labels)
+            print(loss)
             losses.append(loss)
 
         gradients = tape.gradient(loss, model.trainable_variables)
