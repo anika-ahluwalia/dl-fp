@@ -1,5 +1,7 @@
 import tensorflow as tf
 import numpy as np
+# NOTE (anika): added because of addition on line 27
+import keras.backend as K
 
 class BagOfWordsModel(tf.keras.Model):
     def __init__(self, vocab):
@@ -10,7 +12,9 @@ class BagOfWordsModel(tf.keras.Model):
         self.vocab_size = len(vocab)
         self.embedding_size = 200
 
-        self.learning_rate = 0.01
+        self.hidden_layer_size = 100
+
+        self.learning_rate = 0.0001
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
 
         self.max_len = 1  # this is set after we pad the inputs -- see note on line 83
@@ -18,12 +22,15 @@ class BagOfWordsModel(tf.keras.Model):
         # NOTE (lauren): lol one more bug -- all of the logits have a value of 1.??
         self.network = tf.keras.Sequential([
             tf.keras.layers.Embedding(self.vocab_size, self.embedding_size, input_length=self.max_len),
-            tf.keras.layers.LSTM(self.embedding_size),
-            tf.keras.layers.Dense(250, activation='relu'),
+            # NOTE (anika): found an architecture online that doesn't use LSTM -- instead uses Lambda with mean so decided to try it out
+            # https://analyticsindiamag.com/the-continuous-bag-of-words-cbow-model-in-nlp-hands-on-implementation-with-codes/
+            # tf.keras.layers.LSTM(self.embedding_size),
+            tf.keras.layers.Lambda(lambda x: K.mean(x, axis=1), output_shape=(self.batch_size,)),
+            tf.keras.layers.Dense(self.batch_size, activation='relu'),
+            tf.keras.layers.Dense(self.hidden_layer_size, activation='relu'),
             tf.keras.layers.Dense(1, activation='softmax')
         ])
 
-    # NOTE (lauren): added calculating avg review length for max_len in embedding layer so we don't have to iterate twice
     def create_bag_of_words(self, inputs):
         bag = []
         review_length = []
@@ -47,14 +54,12 @@ class BagOfWordsModel(tf.keras.Model):
         return logits
 
     def loss(self, logits, labels):
-        # NOTE (lauren): reshaped this because logits were (50, 1) but labels were (50,)
         logits = tf.reshape(logits, [-1])
         prob = tf.keras.losses.binary_crossentropy(labels, logits)
         loss = tf.reduce_mean(tf.cast(prob, tf.float32))
         return loss
 
     def accuracy(self, predictions, labels):
-        # NOTE (lauren): reshaped this because predictions were (50, 1) but labels were (50,)
         predictions = tf.reshape(predictions, [-1])
         correct_predictions = tf.equal(tf.argmax(predictions), tf.argmax(labels))
         return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
