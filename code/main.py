@@ -8,8 +8,6 @@ from preprocess import get_data, word2vec_preprocess
 import tensorflow as tf
 import numpy as np
 
-from matplotlib import pyplot as plt
-
 # NOTE (anika): returning list of losses for visualization
 def train(model, training_inputs, training_labels):
     losses = []
@@ -42,13 +40,13 @@ def test(model, testing_inputs, testing_labels):
     print("accuracy", accuracy / iterations)
     return accuracy / iterations
 
-def visualize_loss(losses): 
-    x = [i for i in range(len(losses))]
-    plt.plot(x, losses)
-    plt.title('Loss per batch')
-    plt.xlabel('Batch')
-    plt.ylabel('Loss')
-    plt.show()
+# def visualize_loss(losses):
+#     x = [i for i in range(len(losses))]
+#     plt.plot(x, losses)
+#     plt.title('Loss per batch')
+#     plt.xlabel('Batch')
+#     plt.ylabel('Loss')
+#     plt.show()
 
 def main():
     # check user arguments
