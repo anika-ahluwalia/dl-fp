@@ -81,7 +81,7 @@ def main():
         for epoch in range(num_epochs):
             print("epoch ", epoch)
             losses = train(model, training_inputs, training_labels)
-            all_losses.append(losses)
+            all_losses = all_losses + losses
     else:
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath="saved_models/word2vec.ckpt",
                                                          save_weights_only=True,
@@ -100,7 +100,7 @@ def main():
         )
     
     if (len(all_losses) > 0):
-        visualize_loss(all)
+        visualize_loss(all_losses)
 
     print("testing...")
     test(model, testing_inputs, testing_labels)
