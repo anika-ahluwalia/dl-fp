@@ -13,6 +13,5 @@ tfc.run(
     docker_base_image=TF_GPU_IMAGE,
     chief_config=tfc.COMMON_MACHINE_CONFIGS['K80_1X'],
     worker_config=tfc.COMMON_MACHINE_CONFIGS['K80_1X'],
-    worker_count=3,
     job_labels={'job': "my_job"}
 )  # Runs your training on Google Cloud!

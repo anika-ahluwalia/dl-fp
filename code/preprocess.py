@@ -8,6 +8,7 @@ import string
 import re
 import numpy as np
 from tqdm import tqdm
+import tensorflow_cloud as tfc
 
 
 def word2vec_preprocess(review_list: List[List[str]], vocab_dict: Dict[str, int], window_size: int) -> List[List[int]]:
@@ -105,7 +106,7 @@ def get_data(file_path: str, cleaned_file_path: str, inputs_header: str, labels_
     raw_labels = dataset[labels_header].to_list()
 
     cleaned_inputs: List[str]
-    if not os.path.exists(cleaned_file_path):
+    if not os.path.exists(cleaned_file_path) and not tfc.remote():
         # encode the labels as positive or negative
         cleaned_labels = []
         for label in raw_labels:
@@ -122,9 +123,9 @@ def get_data(file_path: str, cleaned_file_path: str, inputs_header: str, labels_
             csv_writer.writerow(["cleaned_review", "sentiment"])
             csv_writer.writerows(list(zip(cleaned_inputs, cleaned_labels)))
     else:
-        cleaned_dataset = np.array(list(csv.reader(open(cleaned_file_path, "r"))))
-        cleaned_inputs = cleaned_dataset[1:, 0]
-        cleaned_labels = cleaned_dataset[1:, 1]
+        cleaned_dataset = pd.read_csv(cleaned_file_path)
+        cleaned_inputs = cleaned_dataset["cleaned_review"].to_list()
+        cleaned_labels = cleaned_dataset["sentiment"].to_list()
 
     ready_inputs = []
     for review in cleaned_inputs:

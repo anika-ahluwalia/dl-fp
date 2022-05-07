@@ -28,15 +28,4 @@ class Word2VecModel(tf.keras.Model):
 
         :param inputs: A list of size batch_size that
         """
-        return self.network(inputs)
-
-    # def loss(self, logits, labels):
-    #     logits = tf.reshape(logits, [-1])
-    #     prob = tf.keras.losses.binary_crossentropy(labels, logits)
-    #     loss = tf.reduce_mean(tf.cast(prob, tf.float32))
-    #     return loss
-    #
-    # def accuracy(self, predictions, labels):
-    #     predictions = tf.reshape(predictions, [-1])
-    #     correct_predictions = tf.equal(tf.argmax(predictions), tf.argmax(labels))
-    #     return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+        return tf.squeeze(self.network(inputs))
