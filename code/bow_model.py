@@ -28,7 +28,7 @@ class BagOfWordsModel(tf.keras.Model):
             tf.keras.layers.Lambda(lambda x: K.mean(x, axis=1), output_shape=(self.batch_size,)),
             tf.keras.layers.Dense(self.batch_size, activation='relu'),
             tf.keras.layers.Dense(self.hidden_layer_size, activation='relu'),
-            tf.keras.layers.Dense(1, activation='softmax')
+            tf.keras.layers.Dense(1, activation=None)
         ])
 
     def create_bag_of_words(self, inputs):
@@ -51,15 +51,13 @@ class BagOfWordsModel(tf.keras.Model):
         bag = self.create_bag_of_words(inputs)
         padded_inputs = self.pad_bags(bag)
         logits = self.network(padded_inputs)
-        return logits
+        return tf.nn.softmax(tf.reshape(logits, [-1]))
 
     def loss(self, logits, labels):
-        logits = tf.reshape(logits, [-1])
-        prob = tf.keras.losses.binary_crossentropy(labels, logits)
+        prob = tf.keras.losses.binary_crossentropy(tf.convert_to_tensor(labels, dtype=tf.float32), logits, from_logits=False)
         loss = tf.reduce_mean(tf.cast(prob, tf.float32))
         return loss
 
     def accuracy(self, predictions, labels):
-        predictions = tf.reshape(predictions, [-1])
-        correct_predictions = tf.equal(tf.argmax(predictions), tf.argmax(labels))
+        correct_predictions = tf.equal(tf.argmax(predictions), tf.argmax(tf.convert_to_tensor(labels, dtype=tf.float32)))
         return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
