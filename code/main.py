@@ -77,22 +77,17 @@ def main():
 
     # initialize model as bag of words or word2vec
     print("making the model...")
+    all_losses = []
     if sys.argv[1] == "BAG_OF_WORDS":
         model = BagOfWordsModel(vocab)
-    elif sys.argv[1] == "WORD2VEC":
-        training_inputs = word2vec_preprocess(training_inputs, vocab, 2)
-        testing_inputs = word2vec_preprocess(testing_inputs, vocab, 2)
-        model = Word2VecModel(len(vocab), 100)
-
-    # train and test data
-    print("training the model...")
-    all_losses = []
-    if not sys.argv[1] == "WORD2VEC":
         for epoch in range(num_epochs):
             print("epoch ", epoch)
             losses = train(model, training_inputs, training_labels)
             all_losses = all_losses + losses
-    else:
+    elif sys.argv[1] == "WORD2VEC":
+        training_inputs = word2vec_preprocess(training_inputs, vocab, 2)
+        testing_inputs = word2vec_preprocess(testing_inputs, vocab, 2)
+        model = Word2VecModel(len(vocab), 100)
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=model_save_path,
                                                          save_weights_only=True,
                                                          verbose=1)
@@ -108,6 +103,7 @@ def main():
             batch_size=120,
             callbacks=[cp_callback]
         )
+
 
     # if (len(all_losses) > 0):
     #     visualize_loss(all_losses)
