@@ -1,5 +1,6 @@
 import sys
 
+import nltk
 from tqdm import tqdm
 
 from bow_model import BagOfWordsModel
@@ -52,6 +53,7 @@ def test(model, testing_inputs, testing_labels):
 
 def main():
     # check user arguments
+    nltk.download("stopwords")
     if len(sys.argv) != 2 or sys.argv[1] not in {"BAG_OF_WORDS", "WORD2VEC"}:
         print("USAGE: python main.py <Model Type>")
         print("<Model Type>: [BAG_OF_WORDS/WORD2VEC]")
@@ -100,8 +102,8 @@ def main():
             metrics=[]
         )
         model.fit(
-            np.array(training_inputs)[:, 0],
-            np.array(training_inputs)[:, 1],
+            x=np.array(training_inputs)[:, 0].reshape((len(training_inputs), 1)),
+            y=np.array(training_inputs)[:, 1],
             epochs=20,
             batch_size=120,
             callbacks=[cp_callback]
