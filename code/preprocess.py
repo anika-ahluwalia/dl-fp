@@ -87,6 +87,8 @@ def build_vocab(inputs: List[List[str]]) -> Dict[str, int]:
     for i in range(len(unique_inputs)):
         vocab[unique_inputs[i]] = i
 
+    print(vocab)
+
     return vocab
 
 

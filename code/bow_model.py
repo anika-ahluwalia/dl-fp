@@ -26,9 +26,9 @@ class BagOfWordsModel(tf.keras.Model):
             # https://analyticsindiamag.com/the-continuous-bag-of-words-cbow-model-in-nlp-hands-on-implementation-with-codes/
             # tf.keras.layers.LSTM(self.embedding_size),
             tf.keras.layers.Lambda(lambda x: K.mean(x, axis=1), output_shape=(self.batch_size,)),
-            tf.keras.layers.Dense(self.batch_size, activation='relu'),
-            tf.keras.layers.Dense(self.hidden_layer_size, activation='relu'),
-            tf.keras.layers.Dense(1, activation=None)
+            tf.keras.layers.Dense(self.batch_size, activation='relu', kernel_initializer='random_normal', bias_initializer='random_normal'),
+            tf.keras.layers.Dense(self.hidden_layer_size, activation='relu', kernel_initializer='random_normal', bias_initializer='random_normal'),
+            tf.keras.layers.Dense(1, kernel_initializer='random_normal', bias_initializer='random_normal', activation=None)
         ])
 
     def create_bag_of_words(self, inputs):
@@ -42,6 +42,7 @@ class BagOfWordsModel(tf.keras.Model):
                 vector[number] += 1
             bag.append(vector)
         self.max_len = int(np.ceil(np.mean(review_length)))
+        print(len(bag))
         return bag
 
     def pad_bags(self, vectorized_inputs):
@@ -51,10 +52,14 @@ class BagOfWordsModel(tf.keras.Model):
         bag = self.create_bag_of_words(inputs)
         padded_inputs = self.pad_bags(bag)
         logits = self.network(padded_inputs)
+        print('LOGITS')
+        print(logits)
         return tf.nn.softmax(tf.reshape(logits, [-1]))
 
-    def loss(self, logits, labels):
-        prob = tf.keras.losses.binary_crossentropy(tf.convert_to_tensor(labels, dtype=tf.float32), logits, from_logits=False)
+    def loss(self, probabilities, labels):
+        print('PROBABILITIES')
+        print(probabilities)
+        prob = tf.keras.losses.binary_crossentropy(tf.convert_to_tensor(labels, dtype=tf.float32), probabilities, from_logits=False)
         loss = tf.reduce_mean(tf.cast(prob, tf.float32))
         return loss
 
