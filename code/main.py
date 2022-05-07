@@ -61,9 +61,11 @@ def main():
     if tfc.remote():
         file_path = "gs://dl-fp/data/IMDBDataset.csv"
         cleaned_file_path = "gs://dl-fp/data/IMDBDataset_cleaned.csv"
+        model_save_path = "gs://dl-fp/saved_models/word2vec.ckpt"
     else:
         file_path = "data/IMDBDataset.csv"
         cleaned_file_path = "data/IMDBDataset_cleaned.csv"
+        model_save_path = "saved_models/word2vec.ckpt"
     input_header = "review"
     label_header = "sentiment"
     num_epochs = 1
@@ -90,7 +92,7 @@ def main():
             losses = train(model, training_inputs, training_labels)
             all_losses = all_losses + losses
     else:
-        cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath="saved_models/word2vec.ckpt",
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=model_save_path,
                                                          save_weights_only=True,
                                                          verbose=1)
         model.compile(
