@@ -7,7 +7,6 @@ from w2v_model import Word2VecModel
 from preprocess import get_data, word2vec_preprocess
 import tensorflow as tf
 import numpy as np
-import tensorflow_cloud as tfc
 
 
 # NOTE (anika): returning list of losses for visualization
@@ -58,14 +57,14 @@ def main():
         print("<Model Type>: [BAG_OF_WORDS/WORD2VEC]")
         exit()
 
-    if tfc.remote():
-        file_path = "gs://dl-fp/data/IMDBDataset.csv"
-        cleaned_file_path = "gs://dl-fp/data/IMDBDataset_cleaned.csv"
-        model_save_path = "gs://dl-fp/saved_models/word2vec.ckpt"
-    else:
-        file_path = "data/IMDBDataset.csv"
-        cleaned_file_path = "data/IMDBDataset_cleaned.csv"
-        model_save_path = "saved_models/word2vec.ckpt"
+    # if tfc.remote():
+    #     file_path = "gs://dl-fp/data/IMDBDataset.csv"
+    #     cleaned_file_path = "gs://dl-fp/data/IMDBDataset_cleaned.csv"
+    #     model_save_path = "gs://dl-fp/saved_models/word2vec.ckpt"
+    # else:
+    file_path = "data/IMDBDataset.csv"
+    cleaned_file_path = "data/IMDBDataset_cleaned.csv"
+    model_save_path = "saved_models/word2vec.ckpt"
     input_header = "review"
     label_header = "sentiment"
     num_epochs = 1
