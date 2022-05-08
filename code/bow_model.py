@@ -26,9 +26,12 @@ class BagOfWordsModel(tf.keras.Model):
             # https://analyticsindiamag.com/the-continuous-bag-of-words-cbow-model-in-nlp-hands-on-implementation-with-codes/
             # tf.keras.layers.LSTM(self.embedding_size),
             tf.keras.layers.Lambda(lambda x: K.mean(x, axis=1), output_shape=(self.batch_size,)),
-            tf.keras.layers.Dense(self.batch_size, activation='relu', kernel_initializer='random_normal', bias_initializer='random_normal'),
-            tf.keras.layers.Dense(self.hidden_layer_size, activation='relu', kernel_initializer='random_normal', bias_initializer='random_normal'),
-            tf.keras.layers.Dense(1, kernel_initializer='random_normal', bias_initializer='random_normal', activation=None)
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Dense(self.batch_size, activation='relu', kernel_initializer='random_normal', bias_initializer='random_normal',  kernel_regularizer='l1'),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.Dense(self.hidden_layer_size, activation='relu', kernel_initializer='random_normal', bias_initializer='random_normal',  kernel_regularizer='l1'),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.Dense(1, kernel_initializer='random_normal', bias_initializer='random_normal', activation=None,  kernel_regularizer='l1')
         ])
 
     def create_bag_of_words(self, inputs):
