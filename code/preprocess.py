@@ -1,6 +1,8 @@
 import csv
 import os
 from typing import Tuple, List, Dict
+
+import gensim
 import nltk.stem
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -9,6 +11,17 @@ import re
 import numpy as np
 from tqdm import tqdm
 import tensorflow_cloud as tfc
+
+
+def words_to_ids(review_list: List[List[str]], vocab_dict: Dict[str, int]) -> List[List[int]]:
+    words_as_ids = []
+    for review in review_list:
+        review_with_ids = []
+        for word in review:
+            review_with_ids.append(vocab_dict[word])
+        words_as_ids.append(review_with_ids)
+
+    return words_as_ids
 
 
 def word2vec_preprocess(review_list: List[List[str]], vocab_dict: Dict[str, int], window_size: int) -> List[List[int]]:
@@ -29,6 +42,17 @@ def word2vec_preprocess(review_list: List[List[str]], vocab_dict: Dict[str, int]
                 if nb_word != word:
                     skipgrams.append([vocab_dict[word], vocab_dict[nb_word]])
     return skipgrams
+
+
+def word2vec_sentiment_preprocess(review_list: List[List[int]], word2vec_model) -> np.ndarray:
+    review_embeddings = []
+    for review in review_list:
+        word_embeddings = []
+        for word in review:
+            word_embeddings.append(word2vec_model.wv[word])
+        review_embeddings.append(np.average(np.array(word_embeddings), axis=0))
+
+    return np.array(review_embeddings)
 
 
 def remove_stop_words(raw_string: str) -> str:

@@ -10,8 +10,8 @@ class Word2VecSentimentModel(tf.keras.Model):
 
         self.embeddings = embeddings
         self.network = tf.keras.Sequential([
-            tf.keras.layers.Dense(200, activation="relu"),
-            tf.keras.layers.Dense(200, activation="relu"),
+            tf.keras.layers.Dense(100, activation="relu"),
+            # tf.keras.layers.Dense(200, activation="relu"),
             tf.keras.layers.Dense(50, activation="relu"),
             tf.keras.layers.Dense(1, activation="sigmoid")
         ])
