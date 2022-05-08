@@ -1,3 +1,4 @@
+import os
 import sys
 from typing import List
 
@@ -107,27 +108,37 @@ def main():
             callbacks=[cp_callback]
         )
     elif sys.argv[1] == "W2VSENTIMENT":
-        words_as_ids: List[List[int]] = []
+        words_as_ids = []
         for review in training_inputs:
-            review_with_ids: List[int] = []
+            review_with_ids = []
             for word in review:
                 review_with_ids.append(vocab[word])
             words_as_ids.append(review_with_ids)
 
-        word2vec_model = gensim.models.Word2Vec(sentences=words_as_ids, vector_size=100, window=2, workers=4)
-        word2vec_model.train(words_as_ids, total_examples=len(words_as_ids), epochs=20)
+        if not os.path.exists("saved_models/word2vec.model"):
+            word2vec_model = gensim.models.Word2Vec(sentences=words_as_ids, vector_size=100, window=2, workers=4,
+                                                    min_count=1)
+            word2vec_model.train(words_as_ids, total_examples=len(words_as_ids), epochs=20)
+            word2vec_model.save("saved_models/word2vec.model")
+        else:
+            word2vec_model = gensim.models.Word2Vec.load("saved_models/word2vec.model")
         model = Word2VecSentimentModel(word2vec_model.wv)
 
-        # words_as_ids = np.array(map())
+        review_embeddings = []
+        for review in words_as_ids:
+            word_embeddings = []
+            for word in review:
+                word_embeddings.append(word2vec_model.wv[word])
+            review_embeddings.append(np.average(np.array(word_embeddings), axis=0))
         model.compile(
             optimizer=tf.keras.optimizers.Adam(),
-            loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+            loss='binary_crossentropy',
             metrics=["accuracy"]
         )
         model.fit(
-            x=np.array(words_as_ids),
+            x=np.array(review_embeddings),
             y=np.array(training_labels),
-            epochs=20,
+            epochs=40,
             batch_size=120
         )
 
