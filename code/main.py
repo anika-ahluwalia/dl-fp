@@ -1,13 +1,16 @@
 import sys
+from typing import List
 
 import nltk
 from tqdm import tqdm
 
 from bow_model import BagOfWordsModel
+from w2v_sentiment_model import Word2VecSentimentModel
 from w2v_model import Word2VecModel
 from preprocess import get_data, word2vec_preprocess
 import tensorflow as tf
 import numpy as np
+import gensim
 
 
 # NOTE (anika): returning list of losses for visualization
@@ -54,9 +57,9 @@ def test(model, testing_inputs, testing_labels):
 def main():
     # check user arguments
     nltk.download("stopwords")
-    if len(sys.argv) != 2 or sys.argv[1] not in {"BAG_OF_WORDS", "WORD2VEC"}:
+    if len(sys.argv) != 2 or sys.argv[1] not in {"BAG_OF_WORDS", "WORD2VEC", "W2VSENTIMENT"}:
         print("USAGE: python main.py <Model Type>")
-        print("<Model Type>: [BAG_OF_WORDS/WORD2VEC]")
+        print("<Model Type>: [BAG_OF_WORDS/WORD2VEC/W2VSENTIMENT]")
         exit()
 
     # if tfc.remote():
@@ -103,7 +106,30 @@ def main():
             batch_size=120,
             callbacks=[cp_callback]
         )
+    elif sys.argv[1] == "W2VSENTIMENT":
+        words_as_ids: List[List[int]] = []
+        for review in training_inputs:
+            review_with_ids: List[int] = []
+            for word in review:
+                review_with_ids.append(vocab[word])
+            words_as_ids.append(review_with_ids)
 
+        word2vec_model = gensim.models.Word2Vec(sentences=words_as_ids, vector_size=100, window=2, workers=4)
+        word2vec_model.train(words_as_ids, total_examples=len(words_as_ids), epochs=20)
+        model = Word2VecSentimentModel(word2vec_model.wv)
+
+        # words_as_ids = np.array(map())
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(),
+            loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+            metrics=["accuracy"]
+        )
+        model.fit(
+            x=np.array(words_as_ids),
+            y=np.array(training_labels),
+            epochs=20,
+            batch_size=120
+        )
 
     # if (len(all_losses) > 0):
     #     visualize_loss(all_losses)
