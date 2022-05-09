@@ -20,9 +20,8 @@ class BagOfWordsModel(tf.keras.Model):
 
         self.max_len = 1  # this is set after we pad the inputs -- see note on line 83
 
-        # NOTE (lauren): lol one more bug -- all of the logits have a value of 1.??
         self.network = tf.keras.Sequential([
-            tf.keras.layers.Embedding(self.vocab_size, self.embedding_size, input_length=self.max_len),
+            # tf.keras.layers.Embedding(self.vocab_size, self.embedding_size, input_length=self.max_len),
             # NOTE (anika): found an architecture online that doesn't use LSTM -- instead uses Lambda with mean so decided to try it out
             # https://analyticsindiamag.com/the-continuous-bag-of-words-cbow-model-in-nlp-hands-on-implementation-with-codes/
             # tf.keras.layers.LSTM(self.embedding_size),
@@ -46,21 +45,18 @@ class BagOfWordsModel(tf.keras.Model):
                 vector[number] += 1
             bag.append(vector)
         self.max_len = int(np.ceil(np.mean(review_length)))
-        print(len(bag))
         return bag
 
     def pad_bags(self, vectorized_inputs):
         return tf.keras.preprocessing.sequence.pad_sequences(vectorized_inputs, maxlen=self.max_len, padding='post', truncating='post')
 
     def call(self, inputs):
-        print("IN CALL")
         bag = self.create_bag_of_words(inputs)
-        padded_inputs = self.pad_bags(bag)
-        logits = self.network(padded_inputs)
-        print('LOGITS')
-        print(logits)
-        # return tf.reshape(logits, [-1])
-        return tf.nest.flatten(logits)
+        # padded_inputs = self.pad_bags(bag)
+        bag = tf.convert_to_tensor(bag)
+        logits = self.network(bag)
+        logits = tf.reshape(logits, (self.batch_size,))
+        return logits
 
     def loss(self, probabilities, labels):
         prob = tf.keras.losses.binary_crossentropy(tf.convert_to_tensor(labels, dtype=tf.float32), probabilities, from_logits=False)
@@ -68,5 +64,12 @@ class BagOfWordsModel(tf.keras.Model):
         return loss
 
     def accuracy(self, predictions, labels):
-        correct_predictions = tf.equal(tf.argmax(predictions), tf.argmax(tf.convert_to_tensor(labels, dtype=tf.float32)))
+
+        # NOTE (anika): trying to make our accuracy mean something
+        # right now its the probabilities and strict equality
+        classify = lambda prob: 1 if prob >= 0.5 else 0
+        classifications = tf.map_fn(classify, predictions)
+
+        # correct_predictions = tf.equal(tf.argmax(predictions), tf.argmax(tf.convert_to_tensor(labels, dtype=tf.float32)))
+        correct_predictions = tf.equal(classifications, tf.convert_to_tensor(labels, dtype=tf.float32))
         return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
