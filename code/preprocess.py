@@ -10,7 +10,6 @@ import string
 import re
 import numpy as np
 from tqdm import tqdm
-import tensorflow_cloud as tfc
 
 
 def words_to_ids(review_list: List[List[str]], vocab_dict: Dict[str, int]) -> List[List[int]]:
@@ -111,8 +110,6 @@ def build_vocab(inputs: List[List[str]]) -> Dict[str, int]:
     for i in range(len(unique_inputs)):
         vocab[unique_inputs[i]] = i
 
-    print(vocab)
-
     return vocab
 
 
@@ -161,8 +158,8 @@ def get_data(file_path: str, cleaned_file_path: str, inputs_header: str, labels_
     # build vocab
     vocab = build_vocab(ready_inputs)
 
-    # we will split the dataset equally between training and testing
-    split_index = (len(ready_inputs) // 10) * 7  # changed to 70/30 split
+    # we will split the dataset 70/30 between training and testing
+    split_index = (len(ready_inputs) // 10) * 7
     training_inputs = ready_inputs[0:split_index + 1]
     training_labels = cleaned_labels[0:split_index + 1]
     testing_inputs = ready_inputs[split_index:]

@@ -18,6 +18,7 @@ import gensim
 def train(model, training_inputs, training_labels):
     losses = []
     for i in tqdm(range(0, len(training_inputs), model.batch_size)):
+        print("TRAINING A BATCH")
         batch_inputs = training_inputs[i: i + model.batch_size]
         batch_labels = training_labels[i: i + model.batch_size]
 
@@ -62,12 +63,7 @@ def main():
         print("USAGE: python main.py <Model Type>")
         print("<Model Type>: [BAG_OF_WORDS/WORD2VEC/W2VSENTIMENT]")
         exit()
-
-    # if tfc.remote():
-    #     file_path = "gs://dl-fp/data/IMDBDataset.csv"
-    #     cleaned_file_path = "gs://dl-fp/data/IMDBDataset_cleaned.csv"
-    #     model_save_path = "gs://dl-fp/saved_models/word2vec.ckpt"
-    # else:
+        
     file_path = "data/IMDBDataset.csv"
     cleaned_file_path = "data/IMDBDataset_cleaned.csv"
     model_save_path = "saved_models/word2vec.ckpt"
