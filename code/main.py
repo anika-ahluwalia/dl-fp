@@ -42,9 +42,9 @@ def test(model, testing_inputs, testing_labels):
     accuracy = 0
 
     for i in tqdm(range(0, len(testing_inputs), model.batch_size)):
+        batch_inputs = testing_inputs[i: i + model.batch_size]
+        batch_labels = testing_labels[i: i + model.batch_size]
         if len(batch_inputs) == model.batch_size:
-            batch_inputs = testing_inputs[i: i + model.batch_size]
-            batch_labels = testing_labels[i: i + model.batch_size]
             predictions = model(batch_inputs)
             batch_accuracy = model.accuracy(predictions, batch_labels)
             accuracy = accuracy + batch_accuracy
