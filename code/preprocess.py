@@ -129,7 +129,10 @@ def get_data(file_path: str, cleaned_file_path: str, inputs_header: str, labels_
     raw_labels = dataset[labels_header].to_list()
 
     cleaned_inputs: List[str]
+
+    # if we have not already done the preprocessing
     if not os.path.exists(cleaned_file_path) and not tfc.remote():
+
         # encode the labels as positive or negative
         cleaned_labels = []
         for label in raw_labels:
@@ -138,24 +141,30 @@ def get_data(file_path: str, cleaned_file_path: str, inputs_header: str, labels_
             elif label == 'negative':
                 cleaned_labels.append(0)
 
+        # clean and stem input words
         cleaned_inputs = list(
             map(lambda s: remove_stop_words(stem(remove_special_chars(remove_html(s))).lower()), raw_inputs))
 
+        # write the preprocessed data to a csv so we don't have to do it every time
         with open(cleaned_file_path, "w") as cleaned_csv:
             csv_writer = csv.writer(cleaned_csv)
             csv_writer.writerow(["cleaned_review", "sentiment"])
             csv_writer.writerows(list(zip(cleaned_inputs, cleaned_labels)))
+
+    # if we have already done the preprocessing and have it stored
     else:
+        # read it in from the csv and assign it
         cleaned_dataset = pd.read_csv(cleaned_file_path)
         cleaned_inputs = cleaned_dataset["cleaned_review"].to_list()
         cleaned_labels = cleaned_dataset["sentiment"].to_list()
 
+    # put all reviews in a list as arrays of words
     ready_inputs = []
     for review in cleaned_inputs:
         review_as_list = review.split()
         ready_inputs.append(review_as_list)
 
-    # build vocab
+    # build vocab using the list that was just created
     vocab = build_vocab(ready_inputs)
 
     # we will split the dataset 70/30 between training and testing

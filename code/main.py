@@ -15,18 +15,31 @@ import numpy as np
 import gensim
 
 
-# NOTE (anika): returning list of losses for visualization
-# also now return list of accuracies over batches for training to visualize
 def train(model, training_inputs, training_labels):
+    """
+    Method to train the model (either model) in batched inputs over all training data.
+
+    :param model: the model upon which we are training
+    :param training_inputs: list of the preprocessed training reviews
+    :param training_labels: list of the labels associated with training reviews
+    :return: list of the accuracies over all training batches
+    :return: list of the losses over all training batches
+    """
+    # lists to store loss and accuracy
     losses = []
     accuracies = []
+
     for i in tqdm(range(0, len(training_inputs), model.batch_size)):
+        # batching inputs
         batch_inputs = training_inputs[i: i + model.batch_size]
         batch_labels = training_labels[i: i + model.batch_size]
 
+        # ensuring that we always have complete batches
         if len(batch_inputs) == model.batch_size:
             with tf.GradientTape() as tape:
+                # generating predictions
                 predictions = model(batch_inputs)
+                # storing loss and accuracy
                 loss = model.loss(predictions, batch_labels)
                 losses.append(loss)
                 accuracy = model.accuracy(predictions, batch_labels)
@@ -38,10 +51,19 @@ def train(model, training_inputs, training_labels):
 
 
 def test(model, testing_inputs, testing_labels):
+    """
+    Method to test the model (either model) in batched inputs on testing data.
+
+    :param model: the model that we are testing.
+    :param testing_inputs: list of the preprocessed testing reviews
+    :param testing_labels: list of the labels associated with testing reviews
+    :return: the overall accuracy of the model on the testing data
+    """
     iterations = int(len(testing_inputs) / model.batch_size)
     accuracy = 0
 
     for i in tqdm(range(0, len(testing_inputs), model.batch_size)):
+        # batching inputs
         batch_inputs = testing_inputs[i: i + model.batch_size]
         batch_labels = testing_labels[i: i + model.batch_size]
         if len(batch_inputs) == model.batch_size:
@@ -54,6 +76,11 @@ def test(model, testing_inputs, testing_labels):
 
 
 def visualize_loss(losses):
+    """
+    Method to visualize the loss of the model over training.
+
+    :param losses: a list of the losses in each training batch
+    """
     x = [i for i in range(len(losses))]
     plt.plot(x, losses)
     plt.title('Loss per batch')
@@ -62,6 +89,11 @@ def visualize_loss(losses):
     plt.show()
 
 def visualize_accuracy(accuracies):
+    """
+    Method to visualize the accuracy of the model over training.
+
+    :param losses: a list of the accuracies in each training batch
+    """
     x = [i for i in range(len(accuracies))]
     plt.plot(x, accuracies)
     plt.title('Accuracy per batch')
@@ -70,13 +102,14 @@ def visualize_accuracy(accuracies):
     plt.show()
 
 def main():
-    # check user arguments
+    # checking user arguments
     nltk.download("stopwords")
     if len(sys.argv) != 2 or sys.argv[1] not in {"BAG_OF_WORDS", "WORD2VEC", "W2VSENTIMENT"}:
         print("USAGE: python main.py <Model Type>")
         print("<Model Type>: [BAG_OF_WORDS/WORD2VEC/W2VSENTIMENT]")
         exit()
 
+    # storing important variables - DO NOT CHANGE
     file_path = "data/IMDBDataset.csv"
     cleaned_file_path = "data/IMDBDataset_cleaned.csv"
     model_save_path = "saved_models/word2vec.ckpt"
@@ -91,6 +124,7 @@ def main():
     # initialize model as bag of words or word2vec
     print("making the model...")
 
+    # lists to store loss and accuracy for visualization
     all_losses = []
     all_accuracies = []
 
@@ -153,9 +187,9 @@ def main():
             y=np.array(testing_labels)
         )
 
+    # if lists were populated, visualize the loss and accuracy
     if (len(all_accuracies) > 0):
         visualize_accuracy(all_accuracies)
-
     if (len(all_losses) > 0):
         visualize_loss(all_losses)
 
