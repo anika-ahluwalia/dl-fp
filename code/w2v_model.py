@@ -2,7 +2,6 @@ import numpy as np
 import tensorflow as tf
 
 
-# Largely copied from word2vec lab
 class Word2VecModel(tf.keras.Model):
     """
     Model for generating vector representations of words in a corpus.
