@@ -65,7 +65,7 @@ class BagOfWordsModel(tf.keras.Model):
         bag = self.create_bag_of_words(inputs)
         bag = tf.convert_to_tensor(bag)
         logits = self.network(bag)
-        logits = tf.reshape(logits, (self.batch_size,))
+        logits = tf.reshape(logits, (len(inputs),))
         return logits
 
     def loss(self, probabilities, labels):

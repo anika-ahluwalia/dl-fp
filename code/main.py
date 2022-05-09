@@ -34,19 +34,17 @@ def train(model, training_inputs, training_labels):
         batch_inputs = training_inputs[i: i + model.batch_size]
         batch_labels = training_labels[i: i + model.batch_size]
 
-        # ensuring that we always have complete batches
-        if len(batch_inputs) == model.batch_size:
-            with tf.GradientTape() as tape:
-                # generating predictions
-                predictions = model(batch_inputs)
-                # storing loss and accuracy
-                loss = model.loss(predictions, batch_labels)
-                losses.append(loss)
-                accuracy = model.accuracy(predictions, batch_labels)
-                accuracies.append(accuracy)
+        with tf.GradientTape() as tape:
+            # generating predictions
+            predictions = model(batch_inputs)
+            # storing loss and accuracy
+            loss = model.loss(predictions, batch_labels)
+            losses.append(loss)
+            accuracy = model.accuracy(predictions, batch_labels)
+            accuracies.append(accuracy)
 
-            gradients = tape.gradient(loss, model.trainable_variables)
-            model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+        gradients = tape.gradient(loss, model.trainable_variables)
+        model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     return losses, accuracies
 
 
@@ -61,17 +59,19 @@ def test(model, testing_inputs, testing_labels):
     """
     iterations = int(len(testing_inputs) / model.batch_size)
     accuracy = 0
+    final_loss = 0
 
     for i in tqdm(range(0, len(testing_inputs), model.batch_size)):
         # batching inputs
         batch_inputs = testing_inputs[i: i + model.batch_size]
         batch_labels = testing_labels[i: i + model.batch_size]
-        if len(batch_inputs) == model.batch_size:
-            predictions = model(batch_inputs)
-            batch_accuracy = model.accuracy(predictions, batch_labels)
-            accuracy = accuracy + batch_accuracy
+        predictions = model(batch_inputs)
+        batch_accuracy = model.accuracy(predictions, batch_labels)
+        accuracy = accuracy + batch_accuracy
+        final_loss = model.loss(predictions, batch_labels)
 
-    print("accuracy", accuracy / iterations)
+    print("accuracy: ", accuracy / iterations)
+    print("final loss: ", final_loss)
     return accuracy / iterations
 
 
