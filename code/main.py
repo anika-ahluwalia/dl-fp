@@ -24,15 +24,16 @@ def train(model, training_inputs, training_labels):
         batch_inputs = training_inputs[i: i + model.batch_size]
         batch_labels = training_labels[i: i + model.batch_size]
 
-        with tf.GradientTape() as tape:
-            predictions = model(batch_inputs)
-            loss = model.loss(predictions, batch_labels)
-            losses.append(loss)
-            accuracy = model.accuracy(predictions, batch_labels)
-            accuracies.append(accuracy)
+        if len(batch_inputs) == model.batch_size:
+            with tf.GradientTape() as tape:
+                predictions = model(batch_inputs)
+                loss = model.loss(predictions, batch_labels)
+                losses.append(loss)
+                accuracy = model.accuracy(predictions, batch_labels)
+                accuracies.append(accuracy)
 
-        gradients = tape.gradient(loss, model.trainable_variables)
-        model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+            gradients = tape.gradient(loss, model.trainable_variables)
+            model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     return losses, accuracies
 
 
