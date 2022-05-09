@@ -1,6 +1,7 @@
 import os
 import sys
 from typing import List
+from matplotlib import pyplot as plt
 
 import nltk
 from tqdm import tqdm
@@ -15,22 +16,24 @@ import gensim
 
 
 # NOTE (anika): returning list of losses for visualization
+# also now return list of accuracies over batches for training to visualize
 def train(model, training_inputs, training_labels):
     losses = []
+    accuracies = []
     for i in tqdm(range(0, len(training_inputs), model.batch_size)):
-        print("TRAINING A BATCH")
         batch_inputs = training_inputs[i: i + model.batch_size]
         batch_labels = training_labels[i: i + model.batch_size]
 
         with tf.GradientTape() as tape:
             predictions = model(batch_inputs)
             loss = model.loss(predictions, batch_labels)
-            print(loss)
             losses.append(loss)
+            accuracy = model.accuracy(predictions, batch_labels)
+            accuracies.append(accuracy)
 
         gradients = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-    return losses
+    return losses, accuracies
 
 
 def test(model, testing_inputs, testing_labels):
@@ -48,13 +51,21 @@ def test(model, testing_inputs, testing_labels):
     return accuracy / iterations
 
 
-# def visualize_loss(losses):
-#     x = [i for i in range(len(losses))]
-#     plt.plot(x, losses)
-#     plt.title('Loss per batch')
-#     plt.xlabel('Batch')
-#     plt.ylabel('Loss')
-#     plt.show()
+def visualize_loss(losses):
+    x = [i for i in range(len(losses))]
+    plt.plot(x, losses)
+    plt.title('Loss per batch')
+    plt.xlabel('Batch')
+    plt.ylabel('Loss')
+    plt.show()
+
+def visualize_accuracy(accuracies):
+    x = [i for i in range(len(accuracies))]
+    plt.plot(x, accuracies)
+    plt.title('Accuracy per batch')
+    plt.xlabel('Batch')
+    plt.ylabel('Accuracy')
+    plt.show()
 
 def main():
     # check user arguments
@@ -63,7 +74,7 @@ def main():
         print("USAGE: python main.py <Model Type>")
         print("<Model Type>: [BAG_OF_WORDS/WORD2VEC/W2VSENTIMENT]")
         exit()
-        
+
     file_path = "data/IMDBDataset.csv"
     cleaned_file_path = "data/IMDBDataset_cleaned.csv"
     model_save_path = "saved_models/word2vec.ckpt"
@@ -77,13 +88,17 @@ def main():
 
     # initialize model as bag of words or word2vec
     print("making the model...")
+
     all_losses = []
+    all_accuracies = []
+
     if sys.argv[1] == "BAG_OF_WORDS":
         model = BagOfWordsModel(vocab)
         for epoch in range(num_epochs):
             print("epoch ", epoch)
-            losses = train(model, training_inputs, training_labels)
+            losses, accuracies = train(model, training_inputs, training_labels)
             all_losses = all_losses + losses
+            all_accuracies = all_accuracies + accuracies
     elif sys.argv[1] == "WORD2VEC":
         training_inputs = word2vec_preprocess(training_inputs, vocab, 2)
         testing_inputs = word2vec_preprocess(testing_inputs, vocab, 2)
@@ -136,8 +151,11 @@ def main():
             y=np.array(testing_labels)
         )
 
-    # if (len(all_losses) > 0):
-    #     visualize_loss(all_losses)
+    if (len(all_accuracies) > 0):
+        visualize_accuracy(all_accuracies)
+
+    if (len(all_losses) > 0):
+        visualize_loss(all_losses)
 
     print("testing...")
     test(model, testing_inputs, testing_labels)
