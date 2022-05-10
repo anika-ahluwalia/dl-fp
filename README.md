@@ -81,3 +81,9 @@ Accuracy computations – Anika
 
 ## Reflection
 Our reflection for mentor check-in 3 can be found [here](https://docs.google.com/document/d/100yG-2A6vtRPgLJNLJhYUCCDILl56G8BkJxYx0_JI_0/edit?usp=sharing).
+
+# Final Submission
+[Final Write-up](https://docs.google.com/document/d/16K4oPgqo1a4b8ow1lGhisep7cE_bk8iJLhFyIxdU4f8/edit?usp=sharing)
+
+
+[Final Poster](https://docs.google.com/presentation/d/18esTGs7y6jxMRzHHqfJt4Qm4t3hpeC8jqLL0EQrNWLg/edit?usp=sharing)

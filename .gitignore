@@ -1,0 +1,7 @@
+dataset/ffhq-dataset-v2.json
+dataset/LICENSE.txt
+dataset/images
+.idea
+env/
+dev/
+*/__pycache__/*
