@@ -2,7 +2,9 @@
 
 ### Disclaimer
 
-You must install pandas, nltk, and beautifulsoup (`pip3 install pandas`, `pip3 install nltk`, and `pip3 install bs4`) in order to run our project.
+You must install pandas, nltk, and beautifulsoup (`pip3 install pandas`, `pip3 install nltk`, and `pip3 install bs4`) in order to run our project. You can also use the `requirements.txt` file to install all dependencies.
+
+The `Word2VecSentiment` model requires access to a trained `Word2Vec` model. You can download our trained models [here](https://drive.google.com/drive/folders/1PeRbYNlfKtqXsmMMIzdvHyf-N5Fnp4h9?usp=sharing). Make sure the model files are in a folder called `saved_models`.
 
 ## Introduction
 
